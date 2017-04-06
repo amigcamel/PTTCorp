@@ -1,0 +1,524 @@
+{% extends "sketch_base.html" %}
+{% load staticfiles %}
+{% load pttcon_filters %} 
+{% load endless %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Concordance" "sketch_concordance" %}
+{% endblock %}
+
+{% block title %}{% block h1 %} Concordance {% endblock %}{% endblock %}
+
+{% block content %}
+
+    {% if output %}
+    <table class="table">
+      <tr>
+        <td>Query:</td>
+        <td>{{query}}</td>
+      </tr>
+      <tr>
+        <td>Window size:</td>
+        <td>{{window_size}}</td>
+      </tr>
+      <tr>
+        <td>Occurrences:</td>
+        <td>{{output|length}}</td>
+      </tr>
+      <tr>
+        <td>First appeared date:</td>
+        <td>
+          {% if time_order == -1 %}
+          {% with output|last as last %}
+          {{last.post_time|conv_to_date}}
+          {% endwith %}
+          {% else %}
+          {% with output|first as first %}
+          {{first.post_time|conv_to_date}}
+          {% endwith %}
+          {% endif %}
+        </td>
+      </table>
+    
+      {% if freq_by_year != None %}
+      <h3 style="text-align:center">Frequency (%)<div id="freq_by_year" style="padding-top:50px"></div></h3>
+      {% endif %}
+      <br>
+      {% if show_pos == 'True' %}
+      <div class="btn-group">
+        <button id="showpos" type="button" class="btn btn-warning">Hide POS</button>
+      </div>
+      {% endif %}
+    
+      <table id="conc" class="table">
+        <thead style="border-bottom:1px solid black">
+          <th>
+           No.
+         </th>
+         <th>
+           Board
+         </th>
+         <th>
+         </th>
+         <th style="text-align:center">
+           Result
+         </th>
+         <th>
+         </th>
+         <th align="center">
+           Post Time
+         </th>
+       </thead>
+       <tbody>
+        {% paginate output %}
+        {% for x in output%}
+        <tr style="cursor:pointer" class="fancybox fancybox.iframe" href="{% url 'sketch.views.source' x.board x.mongoid x.conc.1%}">
+         <td style="vertical-align:middle" width="5%">
+           {{forloop.counter}}.
+         </td>
+         <td width="5%">
+          <div style="vertical-align:middle">
+            {{x.board}}<br>
+            ({{x.board_cht}})
+          </div>  
+        </td>
+        <td align="right" style="vertical-align:middle" witdh="30%">
+         <p class="pos">{{x.conc.0|safe}}</p>
+       </td>
+       <td align="center" style="vertical-align:middle" width="20%">
+           <p class="pos">{{x.conc.1|safe}}</p>
+       </td>
+       <td align="left" style="vertical-align:middle" width="30%">
+         <p class="pos">{{x.conc.2|safe}}</p>
+       </td>
+       <td style="vertical-align:middle" width="10%">
+         {{x.post_time|conv_to_date}}
+       </td>
+     </tr>
+     {% endfor %}
+    
+     <center><div class='pagination'>{% show_pages %}</div></center>
+    
+    </tbody>
+    </table>
+    <br>
+    
+    <center><div class='pagination'>{% show_pages %}</div></center>
+    
+    {% else %}
+
+    <span class="slide-bottom msg">模糊查詢：在欲搜尋字串前加上"&gt;&gt;&gt;"即可進行模糊查詢，例："&gt;&gt;&gt;柯文哲"</span>
+
+    <div class="row">
+        <div class="col-md-10">    
+            <form class="form form-horizontal" role="form">
+            {% for field in form %}
+               <div class="form-group">
+                   <div class="col-md-5">
+                       <h3>{{ field.label_tag }}</h3>
+                       {% if field.errors %}
+                           <span class="errorlist">{{ field.errors.as_text }}</span>
+                       {% endif %}
+                           <div class="field_input">{{ field }}</div>
+                   </div>
+               </div>
+            {% endfor %}
+            <input id="button" class="btn btn-success" type="submit" value="Submit" />
+            {% if not user.is_authenticated %}
+                <div class="fadein_msg">
+                   <div class="slide-bottom msg">Unregistered users can only retrieve <u>5000</u> outputs at most.</div> 
+                </div>
+            {% endif %}
+          </form>
+        </div>
+    </div>
+
+    {% endif %}
+{% endblock content %} 
+        
+{% block after_content %}
+    {% if not output %}
+        <div class="clearfix" style="background-color:#f3f3f3">
+            <div class="wrapper">
+                <div>
+                  <h2>Instruction</h2>
+                  <hr>
+                  <p>PTT Corpus is powered by <a href="http://cwb.sourceforge.net/">The IMS Open Corpus Workbench (CWB)</a>. Users can query corpora by using <a href="http://cwb.sourceforge.net/files/CQP_Tutorial/">CQP Language</a>, or simply input any string you like.</p>
+                  <a href="http://cwb.sourceforge.net/"><img src="http://cwb.sslmit.unibo.it/lib/exe/fetch.php?w=300&tok=e614ac&media=images:logos:ocwb_logo.png"></a>
+                  <br>
+                  <br>
+                  <h2>Examples</h2>
+                  <hr>
+                  <li>[word="給他"][][word="下去"]</li>
+                  <li>[word="開心"][pos="EMOTICON"]</li>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock after_content %}
+
+{% block extra_js %}
+{% if output %}
+    <script src="{% static "js/pos.js" %}"></script></script>
+    <script type="text/javascript">
+      $("#conc > tbody > tr").hover(
+        function () {
+          $(this).css("background","yellow");
+        }, 
+        function () {
+          $(this).css("background","");
+        }
+        );
+    </script>
+    <script>
+    $(document).ready(function(){
+        $('table tr').click(function(){
+            window.location = $(this).attr('href').fancybox(); 
+            return false;
+        });
+    });
+    </script>
+    <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+    <script>
+    //This is adapted from http://jsfiddle.net/reblace/aWJtJ/7/
+    var data = {{freq_by_year|safe}}
+    
+    // Margins, width and height. 
+    var margin = {top: 20, right: 20, bottom: 30, left: 10},
+        body_width = parseInt(d3.select('body').style('width').replace('px','')),
+        width = body_width - margin.left - margin.right -100, //100 is set arbitrarily by me, otherwise it'll be too wide//
+        height = 200 - margin.top - margin.bottom;
+    
+    // Width of bars, without padding. 
+    var barRawWidth = width / (data.length + 2);
+    var barPadding = 10;
+    var xStart = barPadding + (barRawWidth/2);
+    var barWidth = barRawWidth - (barPadding*2);
+    
+    // Scales.
+    var x = d3.time.scale().range([xStart, width-xStart]);
+    var y = d3.scale.linear().range([height, 0]);
+    
+    // Construct our SVG object.
+    var svg = d3.select("#freq_by_year").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    // X-axis.
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(d3.time.year, 1)
+        .tickFormat(d3.time.format('%Y'));
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        //.call(xAxis);
+    
+    // Date parsing.
+    var parseDate = d3.time.format("%Y");
+    data.forEach(function(d) {
+      d.date = parseDate.parse(d.year);
+    });
+    
+    // Set scale domains. 
+    var xExtent = d3.extent(data, function(d) { return d.date; });
+    var nxExtent = [d3.time.month.offset(xExtent[0], -1), d3.time.month.offset(xExtent[1], 1)];
+    x.domain(nxExtent);
+    y.domain([0, d3.max(data, function(d) { return d.count; })]);
+    
+    // Call x-axis. 
+    d3.select(".x.axis")
+        .transition().duration(600)
+        .call(xAxis);
+    
+    // Draw bars. 
+    var bars = svg.selectAll(".count")
+            .data(data, function(d) { return d.year; });
+    
+    bars.exit().remove();
+        
+    bars.transition().duration(1000)
+        .attr("x", function(d) { return x(d.date) - (barWidth/2); })
+        .attr("width", barWidth)
+        .attr("y", function(d) { return y(d.count); })
+        .attr("height", function(d) { return height - y(d.count);});
+        
+    bars.enter().append("rect")
+        .attr("class", "count")
+        .attr("width", barWidth)
+        .attr("x", function(d) { return x(d.date) - (barWidth/2); })
+        .attr("y", height)
+        .attr("height", 0)
+        .transition().duration(1000)
+        .attr("y", function(d) { return y(d.count); })
+        .attr("height", function(d) { return height - y(d.count);});
+    
+    //Append text to the top of each bar
+    //This method is quite stupid, but it works anyway...
+    var tmp = $('.count')
+    
+    setTimeout(
+      function() 
+      {
+    
+          for (i=0; i<data.length; i=i+1) {
+              svg.append('text').text(data[i].count)
+                              .attr("x", tmp[i].x.baseVal.value+5)
+                              .attr('y', tmp[i].y.baseVal.value+10)
+                              .attr("font-size", "11px")
+                              .attr('fill', 'white')
+          }
+    
+      }, 1500); 
+    </script>
+
+{% comment %}
+<script>
+  var w = 600;
+  var h = 250;
+  var padding = 100;
+
+  var data = {{freq_by_year|safe}}
+
+
+  function formatData(data) {
+    var j = data.length;
+    for (var i = 0; i < j; i++) {
+      data[i].date = new Date(data[i].year, -1, 1);
+    }
+    return data;
+  }
+
+  var dataset = formatData(data);
+
+  var xScale = d3.scale.ordinal()
+  .domain(d3.range(dataset.length))
+  .rangeRoundBands([0, w], 0.05);
+
+  var yScale = d3.scale.linear()
+  .domain([0, d3.max(dataset, function (d) {
+    return d.count;
+  })])
+  .range([0, h]);
+
+  var date = function (d) {
+    return d.date;
+  };
+
+//Create SVG element
+var svg = d3.select("#freq_by_year")
+.append("svg")
+.attr("width", w)
+.attr("height", h+padding);
+
+//Create bars
+svg.selectAll("rect")
+.data(dataset, date)
+.enter()
+.append("rect")
+.attr("x", function (d, i) {
+  return xScale(i);
+})
+.attr("y", function (d) {
+  return h - yScale(d.count);
+})
+.attr("width", xScale.rangeBand())
+.attr("height", function (d) {
+  return yScale(d.count);
+})
+.attr("fill", function (d) {
+  return "rgb(0, 0, 0)";
+})
+
+//Create labels
+svg.selectAll("text")
+.data(dataset, date)
+.enter()
+.append("text")
+.text(function (d) {
+  return d.count;
+})
+.attr("text-anchor", "middle")
+.attr("x", function (d, i) {
+  return xScale(i) + xScale.rangeBand() / 2;
+})
+.attr("y", function (d) {
+  return h - yScale(d.count) + 14;
+})
+.attr("font-family", "sans-serif")
+.attr("font-size", "11px")
+.attr("fill", "white");
+
+var xTimeDomain = d3.extent(dataset, function (d) {
+  return d.date;
+});
+
+var xTimeScale = d3.time.scale().
+domain(xTimeDomain).
+range([0, w]);
+
+var xAxis = d3.svg.axis().
+scale(xTimeScale).
+orient("bottom").
+tickFormat(d3.time.format("%Y"));
+
+svg.append("g").
+attr("class", "xaxis axis").
+attr("transform", "translate(0," + h + ")").
+call(xAxis);
+
+
+var bar_pos_new = $("rect").map(function(){
+  return Number($(this).attr("x")) + $(this).attr("width")/4;
+}).get();
+
+var cnt = Number(0);
+$("g[class='tick']").map(function(){
+  $(this).attr('transform','translate('+bar_pos_new[cnt]+',0)');
+  cnt++;
+});
+</script>
+{% endcomment %}
+
+{% else %}
+<!-- jquery datepicker START -->
+{% comment %}
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+{% endcomment %}
+    <script>
+    $(document).ready(function() {
+        $('#id_start_date').datepicker({
+                    buttonText: '',
+                    changeYear: true,
+                    //showOn: "button",
+                    //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+                    //buttonImageOnly: true,
+                    yearRange: '-100:+0',
+                    minDate: new Date(2001, 1 - 1, 1),
+                    // ref: http://www.jquerybyexample.net/2012/01/end-date-should-not-be-greater-than.html
+            onSelect: function(selected) {
+                   $("#id_end_date").datepicker("option","minDate", selected)
+                   }
+                   });
+        $('#id_end_date').datepicker({
+                    buttonText: '',
+                    changeYear: true,
+                    //showOn: "button",
+                    //buttonImage: "http://jqueryui.com/resources/demos/datepicker/images/calendar.gif",
+                    //buttonImageOnly: true,
+                    yearRange: '-100:+0',
+                    minDate: new Date(2001, 1 - 1, 1),
+                    maxDate: '0',
+                    onSelect: function(selected) {
+                        $("#id_start_date").datepicker("option","maxDate", selected)
+                    }
+            });
+            // $("#id_start_date").attr('readOnly','true');
+            // $("#id_end_date").attr('readOnly','true');
+    });
+    </script>
+    <!-- jquery datepicker END -->
+    
+    <script>
+        $('input[type="text"],input[type="number"]').attr('class', 'form-control');
+        $('input[id="id_start_date"]').attr('placeholder', 'Optional');
+        $('input[id="id_end_date"]').attr('placeholder', 'Optional');
+
+
+
+
+        //disable comment function temporarily
+        $('input[id="id_corpus_1"]').attr('disabled', true);
+        $('label[for="id_corpus_1"]').wrapInner('<s></s>');
+        $('#id_corpus').attr({'title':'Comments (推噓文) is temporarily disabled!'});
+        $('label[for="id_window_size"]').after('<span id="slider-window_size" style="padding-left:10px;"></span><div id="window-slider"></div>');
+        
+
+        // convert radio button to bootstrap's style
+        $('.field_input input[type="radio"]').parent().parent().addClass('btn-group').prop('');
+        $('input[type="radio"]').parent().attr('class', 'btn btn-default');
+        $('input[type="radio"]:checked').closest('label').addClass('active');
+        $('input[type="radio"]').css('display', 'none');
+        $(function () {
+            $('input:radio').change(
+            function () {
+                var label_for = $(this).closest('label').attr('for');
+                $('label[for="' + label_for + '"]').addClass('active');
+                $(this).parent().siblings('label').not('[for="' + label_for + '"]').removeClass('active');
+            });
+        });
+
+        $('input[type="checkbox"]').attr('checked', true);
+        $('input[id="id_query"]').after('<span id="msg" style="color:#F88017"></span>');
+        $('input[id="id_query"]').keyup(function () {
+            var value = $(this).val();
+            if (value.indexOf('[') === 0) {
+                $("#msg").html("You're using CQL syntax").show();
+            } else {$("#msg").html("").show();}
+        });
+
+    </script>
+    <script src="https://cdn.rawgit.com/ehynds/jquery-ui-multiselect-widget/e0937459/src/jquery.multiselect.min.js"></script>
+    <script type="text/javascript">
+    $(function(){
+    	$("select").multiselect();
+    })
+    </script>
+    <script>
+    $("#window-slider").slider(
+    {
+                value:6,
+                min: 1,
+                max: 10,
+                step: 1,
+                slide: function( event, ui ) {
+                    $( "#slider-window_size" ).html( ui.value );
+                    $("#{{form.window_size.auto_id}}").val(ui.value);
+                }
+    }
+    );
+    $( "#slider-window_size" ).html(  $('#window-slider').slider('value') );
+    </script>
+
+    <!--Jquery fadethis (fade element when scroll to viewport
+        ref: http://lwiesel.github.io/jquery-fadethis/ -->
+    <script src="http://lwiesel.github.io/jquery-fadethis/dist/jquery.fadethis.js"></script>
+    <script>
+        $('.fadein_msg').fadeThis({speed: 600, reverse:false});
+    </script>
+
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+    {% if not output %}
+        <link rel="stylesheet" href="https://cdn.rawgit.com/ehynds/jquery-ui-multiselect-widget/e0937459/jquery.multiselect.css">
+
+        <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/pepper-grinder/jquery-ui.css">
+        <style>
+        ul {
+            list-style-type: none;
+            margin: 10px;
+            padding: 10px;
+        }
+        .msg {
+            margin-top: 20px;
+            width: 53%;
+            font-family: Copperplate, 'Copperplate Gothic Light', sans-serif;
+            background-color: #FFF8C6;
+            -moz-border-radius: 1em 3em 1em 3em;
+            border-radius: 1em 3em 1em 3em;
+        }
+        .ui-datepicker {
+          z-index: 1003 !important;
+        }
+        </style>
+    {% endif %}
+{% endblock %}

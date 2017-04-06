@@ -1,0 +1,137 @@
+{% extends "intro_base.html" %}
+{% load humanize %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Data" "intro_data" %}
+{% endblock %}
+
+{% block title %}{% block h1 %} Data {% endblock %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.min.css">
+{% endblock %}
+
+{% block content %} 
+<table id="data-table" class="tablesorter" width="100%">
+<p><b>(Tip:</b> You can Sort multiple columns simultaneously by holding down the shift key and clicking other header)</p>
+
+    <caption>Database Details</caption>
+    <thead>
+        <tr>
+            <th>
+                Board
+            </th>
+            <th>
+                Posts
+            </th>
+            <th>
+                Last Update 
+            </th>
+            <th>
+                First Post
+            </th>
+            <th>
+                Raw Tokens
+            </th>
+            <th>
+                Raw Types
+            </th>
+            <th>
+                Word Tokens
+            </th>
+            <th>
+                Word Types
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for x in metainfo %}
+        <tr>
+            <td>
+                <a href="#" data-ref="sub_{{x.board}}" data-toggle="modal" data-target="#detailModal">{{x.board}}</a> ({{x.board_cht}})
+            </td>
+            <td>
+                {{x.post_number|intcomma}}
+            </td>
+            <td>
+                {{x.last_time|date:"Y-m-d"}}
+            </td>
+            <td>
+                {{x.first_time|date:"Y-m-d"}}
+            </td>
+            <td>
+                {{x.token_number|intcomma}}
+            </td>
+            <td>
+                {{x.type_number|intcomma}}
+            </td>
+            <td>
+                {{x.word_token_number|intcomma}}
+            </td>
+            <td>
+                {{x.word_type_number|intcomma}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% for x in metainfo %}
+<table id="sub_{{x.board}}" class="tablesorter", width="100%" style="display:none">
+<caption>{{x.board}}</caption>
+    <thead>
+        <tr>
+            <th>
+                Year
+            </th>
+            <th>
+                Post Number
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, post_num in x.post_number_by_year.iteritems %}
+            <tr>
+                <td width="200px">
+                    {{year}}
+                </td>
+                <td width="200px">
+                    {{post_num}}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+<!-- Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-body"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+<script src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.min.js"></script>
+<script>
+$('#data-table').DataTable({
+    "order": [[ 1, "desc" ]],
+    "paging": false,
+});
+$('a[data-ref^="sub"]').click(function() {
+    ref = $(this).attr('data-ref');
+    $('.modal-body').empty();
+    $('.modal-body').append($('#'+ref));
+    $('#'+ref).show().DataTable({
+        "order": [[ 0, "desc" ]],
+        "paging": false,
+    });
+});
+</script>
+{% endblock %}

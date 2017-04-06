@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load pttcon_filters %} 
+
+{% block title %}{% block h1 %} Sentipol Classifier (情緒極性分類器) {% endblock %}{% endblock %}
+{% block content %}
+{% if form %}
+<h3>
+Sentipol (sentiment polarity) classifier is used to classify sentiment polarity into <em>positive</em> and <em>negative</em>.<br>
+Be aware that Sentipol classifer is for <u>demonstrative</u> and <u>experimental</u> purpose only, and the results might not conform to your expectation.<br>
+The major problem I'm facing with is the algorithm that I'm using is too naive, but I'll replace it if I find a better one.
+</h3>
+<hr>
+<h3>Input any text or sentence below:</h3>
+<div class="row">
+  <div class="col-md-10">
+      <form class="form form-horizontal" role="form" action="{% url 'sentiment.views.sentipol' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+      {% for field in form %}
+       <div class="form-group">
+         <div class="col-md-8">
+          {{ field.label_tag }}
+          {% if field.errors %}
+          <span class="errorlist">{{ field.errors.as_text }}</span>
+          {% endif %}
+          {{ field }}
+         </div>
+       </div>
+       {% endfor %}
+       <div class="col-md-8">
+         <input type="submit" value="Submit" class="btn">
+       </div>
+       </form>
+  </div>
+</div>
+
+{% elif content %}
+<div>
+<h2>Result:</h2>
+<div class="grid_12">
+<p>{{content|safe}}</p>
+</div>
+<div class="grid_2">
+<h2>Polarity</h2>
+<p style="font-size:2.8em">{{pol}}</p>
+</div>
+<div class="grid_5">
+<h2 style="background-color:yellow;text-align:center">Positive words</h2>
+{% for x in pos %}
+{{x.0}} ({{x.1}})
+{% endfor %}
+</div>
+<div class="grid_5">
+<h2 style="background-color:blue;color:white;text-align:center">Negative words</h2>
+{% for x in neg %}
+{{x.0}} ({{x.1}})
+{% endfor %}
+</div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="{% static 'js/pos.js' %}"></script>
+<script>
+$('span[class="positive"]').css('background-color', 'yellow');
+$('span[class="negative"]').css({'background-color':'blue', 'color':'white'});
+</script>
+{% endblock %}

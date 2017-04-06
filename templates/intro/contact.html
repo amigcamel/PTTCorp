@@ -1,0 +1,45 @@
+{% extends "intro_base.html" %}
+{% load staticfiles %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block h1 %}{% block title %}Contact{% endblock %}{% endblock %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Contact" "intro_contact" %}
+{% endblock %}
+
+{% block content%}
+<h3>If you have any opinions, ideas, complaints or whatever, please leave the message below, thank you!<br>
+If you are interested in me, you can visit my <a href="http://lope.x64.me/ajiblog", target="_blank">blog</a>
+</h3>
+<hr>
+
+<div class="row">
+  <div class="col-md-10">    
+      <form class="form form-horizontal" role="form" action="{% url 'intro.views.contact' %}" method="post">{% csrf_token %}
+      {% for field in form %}
+       <div class="form-group">
+         <div class="col-md-5">
+          {{ field.label_tag }}
+          {% if field.errors %}
+          <span class="errorlist">{{ field.errors.as_text }}</span>
+          {% endif %}
+          {{ field }}
+         </div>
+       </div>
+       {% endfor %}
+       <input id="button" class="btn" type="submit" value="Submit" />
+      </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/captcha.js' %}"></script>
+<script>
+$('input, textarea').not('[id="button"]').attr('class', 'form-control');
+$('textarea').parent().attr('class', 'col-md-8');
+</script>
+{% endblock %}

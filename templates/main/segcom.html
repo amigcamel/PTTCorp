@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load pttcon_filters %}
+
+{% block title %}{% block h1 %} Segcom {% endblock %}{% endblock %}
+
+{% block content %}
+{% if form %}
+<div>
+	<form action="{% url 'segmentation.views.segcom' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+		{{form.as_p}}
+		<input class="btn" type="submit" value="Submit"/>
+	</form>
+</div>
+<div>
+<hr>
+	<h2>What is Segcom?</h2>
+	<p>A tool for comparing the different results from Jseg and PyCCS</p>
+</div>
+{% elif jieba_res %}
+<div class="grid_6">
+	<h3>Jseg</h3>
+	{{jieba_res|safe|linebreaks}}
+</div>
+<div class="grid_6">
+	<h3>CKIP Segmentator</h3>
+	{{ckip_res|safe|linebreaks}}
+</div>
+
+{% elif errmsg %}
+<h2>Error found!</h2>
+<hr>
+<p>Unknown problem</p>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pos.js' %}"></script>
+<script>
+$('span').css('background-color', '#FC0');
+</script>
+{% endblock %}

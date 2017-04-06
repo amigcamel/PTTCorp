@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load pttcon_filters %} 
+{% block title %}{% block h1 %} Jseg (「結巴」斷詞系統) {% endblock %}{% endblock %}
+
+{% block content %}
+{% if form %}
+<div>
+    <form action="{% url 'segmentation.views.seg_jseg' %}" method="post" enctype="multipart/form-data">{% csrf_token %} 
+      {% for field in form %}
+          
+           
+          <div>{{ field.label_tag }}
+          {% if field.errors %}
+          <span class="errorlist">{{ field.errors.as_text }}</span>
+          {% endif %}
+          </div>
+
+          <div>{{ field }}</div>
+          {% if field.help_text %}
+          <div><em>Note: {{ field.help_text }}</em></div>
+          {% endif %}
+          <br>
+       {% endfor %}
+
+        <div><input class="btn" type="submit" value="Submit"/></div>
+    </form>
+</div>
+<div>
+    <h2>What is Jseg? <a href="https://github.com/amigcamel/Jseg"><img src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Logo.png" width="80"></a></h2>
+    <hr>
+    <li>An enhanced version of <a href="https://github.com/fxsjy/jieba">Jieba</a> segmentator</li>
+    <li>Using directed acyclic graph</em> (DAG) and Hidden Markov Model (HMM) to segmentate Chinese words</li>
+    <li>Data are trained with Sinica Corpora</li>
+    <li>Equipped with Emoticon detection</li>
+    <li>F1-score: 0.91</li>
+</div>
+{% elif output %}
+<div style="display:none" id="lgmsg">
+    <h3>If you have an account, please <a href="{% url "auth_login" %}">log in</a>.</h3>
+    <h3>If not, you can <a href="{% url "registration_register" %}">register here</a>.</h3>
+    <a href="http://tw.yahoo.com"></a>
+</div>
+<h2>Result:</h2>
+<p>Download as:
+    {% with 'txt csv' as exts %}
+    {% for ext in exts.split %}
+    <a {% if user.is_authenticated %}href="{% url 'download_res' ext %}"{% else %}class="fancybox" href="#lgmsg" title="Login first!"{% endif %}><img src="{% static "icons/"|add:ext|add:".png" %}" alt={{ext}}></a>
+    {% endfor %}
+    {% endwith %}
+</p>
+<p><button id="showpos" type="button" class="btn btn-success">Hide POS</button></p>
+<p class="pos">{{output|safe}}</p>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static "js/pos.js" %}"></script>
+{% endblock %}

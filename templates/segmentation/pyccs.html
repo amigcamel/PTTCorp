@@ -1,0 +1,55 @@
+{% extends "segmentation_base.html" %}
+{% load staticfiles %}
+{% load pttcon_filters %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "PyCCS" "segmentation_pyccs" %}
+{% endblock %}
+
+{% block title %}{% block h1 %} PyCCS (中研院線上斷詞API) {% endblock %}{% endblock %}
+{% block content %}
+{% if form %}
+<div>
+	<form action="{% url 'segmentation.views.pyccs' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+		{{form.as_p}}
+		<input class="btn" type="submit" value="Submit"/>
+	</form>
+</div>
+<div>
+	<h2>What is PyCCS? <a href="https://github.com/amigcamel/PyCCS"><img src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Logo.png" width="80px"></a></h2>
+	<hr>
+	<li>An API for <a href="http://ckipsvr.iis.sinica.edu.tw/">CKIP Segmentator</a> written in Python</li>
+	<li>Automatically separate word and POS tags</li>
+	<li>Html-like tag can be segmentated normally</li>
+</div>
+{% elif output %}
+<h2>Result:</h2>
+<p>Download as:
+	{% with 'txt csv' as exts %}
+	{% for ext in exts.split %}
+	<a {% if user.is_authenticated %}href="{% url 'download_res' ext %}"{% else %}class="fancybox" href="#lgmsg" title="Login first!"{% endif %}><img src="{% static "icons/"|add:ext|add:".png" %}" alt={{ext}}></a>
+	{% endfor %}
+	{% endwith %}
+</p>
+
+<button id="showpos" type="button" class="btn btn-warning">Hide POS</button>
+
+<div class="pos">{{output|safe|linebreaks}}</div>
+
+{% elif errmsg %}
+<p><font color="red">Error found!</font></p>
+<hr>
+<p>There might be some characters (e.g., "堃", "瑠") which cannot be encoded into CP950/BIG5.<br>
+	It's sad that CKIP Segmentator cannot parse those characters only...
+</p>
+{% endif %}
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pos.js' %}"></script>
+{% endblock %}

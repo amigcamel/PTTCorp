@@ -1,0 +1,73 @@
+{% extends "registration/registration_base.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Log in" "login" %}
+{% endblock %}
+
+{% block title %}{% block h1 %}{% trans "Login" %}{% endblock %}{% endblock %}
+{% block content %}
+<div class="grid_6">
+    <h2>You can log in with Facebook</h2>
+    <form action="{% url 'facebook_connect' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" value="{{ request.path }}" name="next" />
+    
+        <div id="facebook_login_js">
+        <input id='fblgn' onclick="F.connect(this.parentNode.parentNode); return false;" type="image" src="{% static 'facebook/images/facebook_login.png' %}" />
+        </div>
+    </form>
+</div>
+{% url 'auth_password_reset' as auth_pwd_reset_url %}
+
+<form method="post" action="{% url 'auth_login' %}">{% csrf_token %}
+{% comment %}
+{% if '__all__' in form.errors %}
+<p class="errorlist">Wrong username and password</p>
+{% endif %}
+{% endcomment %}
+<div class="grid_6">
+    <h2>Or you can log in with PTTCorp account</h2>
+    <form class="form form-horizontal" role="form" action="" method="post">{% csrf_token %}
+    {{form.as_p}}
+    <p>{% blocktrans %}<a href="{{ auth_pwd_reset_url }}">Forgot your password?</a>{% endblocktrans %}</p>
+    <input id="lgbtn" class="btn btn-success" type="submit" value="{% trans "login" %}" />
+    <input type="hidden" name="next" value="{{ next }}" /> 
+</form>
+</div>
+{% comment %}
+<div class="row">
+  <div class="col-md-10">
+      <form class="form form-horizontal" role="form" action="" method="post">{% csrf_token %}
+      {% for field in form %}
+       <div class="form-group">
+         <div class="col-md-8">
+          {{ field.label_tag }}
+          {% if field.errors %}
+          <span class="errorlist">{{ field.errors.as_text }}</span>
+          {% endif %}
+          {{ field }}
+          <hr>
+         </div>
+       </div>
+       {% endfor %}
+       <div class="col-md-8">
+         <p>{% blocktrans %}<a href="{{ auth_pwd_reset_url }}">Forgot your password?</a>{% endblocktrans %}</p>
+         <input id="lgbtn" class="btn btn-success" type="submit" value="{% trans "login" %}" />
+         <input type="hidden" name="next" value="{{ next }}" /> 
+       </div>
+       </form>
+  </div>
+</div>
+{% endcomment %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$('input:not(#lgbtn, #fblgn)').addClass("form-control")
+</script>
+{% endblock %}

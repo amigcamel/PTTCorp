@@ -1,0 +1,35 @@
+<html>
+<head>
+	<style type="text/css">
+		body {color:white;
+			font-family:Osaka, Arial, sans-serif;
+		}
+
+		a:link, a:hover, a:active, a:visited {
+			color:red;
+			text-decoration:none;
+		}
+
+		span {
+			background-color:yellow;
+			color:black;
+		}
+	</style>
+</head>
+<body bgcolor="black">
+	<h1>
+		看板: {{output.board}} <br>
+		標題: {{output.title}} <br>
+		時間: {{output.post_time}} <br>
+		作者: {{output.author}} <br>
+		原文連結: {% if output.URL == 'deleted' %}
+		<div style="color:red"> 已被刪除</div>
+		{% else %}
+		<a href="{{output.URL}}">LINK</a>
+		{% endif %}
+		<hr>
+		{{output.content|safe|linebreaks}}
+	</h1>
+</body>
+</html>
+

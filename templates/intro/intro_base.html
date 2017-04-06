@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Introduction" "intro_main" %}
+{% endblock %}
+

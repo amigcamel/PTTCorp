@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load django_bootstrap_breadcrumbs %}
+{% load load_settings %}
+{% load pygmentify %}
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "API" "api" %}
+{% endblock %}
+
+{% block h1 %}{% block title %}API{% endblock title %}{% endblock h1 %}
+
+{% block content %}
+    <h2>Contents</h2>
+    <ul>
+        <li><a href="#prerequisite">Prerequisite</a></li>
+        <li><a href="#limitations">Limitations</a></li>
+        <li><a href="#auth">Authentication</a></li>
+        <li><a href="#services">Services</a></li>
+    </ul>
+    <hr>
+    {% pygment %}
+        <h3 id="prerequisite">Prerequisite</h3>
+        <p>You have to be a registered user.</p>
+        <h3 id="limitations">Limitations</h3>
+        <p>Maximum request: {% settings_value "REST_FRAMEWORK" "DEFAULT_THROTTLE_RATES" "user" %}</p>
+        <p>You will get<code>HTTP Error 429: TOO MANY REQUESTS</code> if you exceed the maximum request.</p>
+        <h3 id="auth">Authentication</h3>
+        <p>Here we use <code>Python</code> as an example.</p>
+        <p>1. First, install <code>urllib2</code> opener</p>
+        <br>
+        <p>(Code adapted from <a href="http://stackoverflow.com/a/24048852/1105489" target="_blank">here</a>)</p>
+        <pre lang="python">
+import urllib2, base64
+
+class PreemptiveBasicAuthHandler(urllib2.HTTPBasicAuthHandler):
+    def http_request(self, req):
+        url = req.get_full_url()
+        realm = None
+        user, pw = self.passwd.find_user_password(realm, url)
+        if pw:
+            raw = "%s:%s" % (user, pw)
+            auth = 'Basic %s' % base64.b64encode(raw).strip()
+            req.add_unredirected_header(self.auth_header, auth)
+        return req
+
+    https_request = http_request
+
+api_url = "http://lopen.linguistics.ntu.edu.tw/PTT/api/"
+username = "foo"
+password = "bar"
+
+auth_handler = PreemptiveBasicAuthHandler()
+auth_handler.add_password(realm=None, uri=api_url, user=username, passwd=password)
+opener = urllib2.build_opener(auth_handler)
+urllib2.install_opener(opener) 
+        </pre>
+        <p>Then you can use <code>urllib2.urlopen(api_url)</code> to access any api url.</p>
+        <br>
+        <p>To test whether you're authenticated, try this:</p>
+        <pre lang="python">
+urllib2.urlopen('http://lopen.linguistics.ntu.edu.tw/PTT/api/test').read()
+        </pre>
+        <p>If authenticated, you'll get <code>{'status':'ok'}</code>; <br>if not, <code>HTTPError: HTTP Error 403: FORBIDDEN</code> will be raised.</p>
+        <h3 id="services">Services</h3>
+        <ul>
+            <li>
+                <h4>Authentication test</h4>
+                <ul class="service">
+                    <li>Description</li>
+                    Test authentication status
+                    <li>Usage</li>
+                    <code>/PTT/api/test</code>
+                </ul>
+            </li>
+            <li>
+                <h4>Article</h4>
+                <ul class="service">
+                    <li>Description</li>
+                    Get articles (po文)
+                    <li>Usage</li>
+                    <code>/PTT/api/article/BOARD/from/START_DATE/to/END_DATE</code><br> 
+                    <u>Date format</u>: <code>yyyy-mm-dd</code>
+                    <li>Limitation</li>
+                    You cannot search time range over <b>180 days</b>.<br>
+                    For example, if <u>START_DATE</u> is <code>2001-01-01</code>, <u>END_DATE</u> cannot be greater than <code>2001-06-30</code>.
+                    <li>Example</li>
+                    Getting all the posts from <i>joke</i> (就可版) from <code>2014-01-01</code> to <code>2014-05-01</code><br>
+                    {% with '/PTT/api/article/joke/from/2014-01-01/to/2014-05-01' as url %}
+                        <a href="{{url}}">{{url}}</a>
+                    {% endwith %}
+                </ul>
+            </li>
+            
+        </ul>
+
+        
+
+    {% endpygment %}
+{% endblock content %}
+
+{% block extra_css %}
+    <link href="{% static 'css/vim.css' %}" media="screen" rel="stylesheet" type="text/css">
+    <style>
+    h3 {color:#09F; padding-top:20px;}
+    h4 {text-transform:uppercase;}
+    ul.service li {color:blue;padding-top:10px;}
+    </style>
+{% endblock extra_css %}

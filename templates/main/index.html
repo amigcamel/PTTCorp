@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block breadcrumb_wrapper %}{% endblock breadcrumb_wrapper %}
+
+{% block page_header %}{% endblock page_header %}
+{% block title %}批踢踢語料庫{% endblock title %}}
+
+{% block content%}
+    {% comment %}
+    <h2 style="color:red">2015.01.07</h2>
+    Concordance 長條圖問題已修正
+    <hr>
+    <h2 style="color:red">2015.01.06</h2>
+    前幾天由於網路發生問題導致無法連線，敬請見諒，順便祝福大家新年快樂～
+    <hr>
+    <h2 style="color:red">2014.11.28</h2>
+    PTTCorp now provides <a href="{% url 'api' %}">API</a> for registered users!<br>
+    <hr>
+    <h2 style="color:red">2014.10.06</h2>
+    <h3>
+    Welcome to PTTCorp! <br>
+    You can find the slides <a href="http://140.112.147.131/static_ajiblog/html/PTT/slides.html" target="_blank">HERE</a>.<br>
+    If you want to contact me, please click <a href="{{intro_contact}}">HERE</a>.<br>
+    If you're interested in me, you can visit my <a href="http://140.112.147.131/ajiblog" target="_blank">blog</a>
+    </h3>
+    <hr>
+    {% endcomment %}
+    <h2 class='title' style="text-align:center" id="help">八卦版都在聊什麼？</h2>
+    {% comment %}
+    <div id="help_1" style="display:none;background:#f5f5f5">Unfortunately, theses words are manually selected. All of them are high frequency words observed in Hate board (黑特版) . <br>By the way, the size of each word does not represent anything.<br>Recently, I'm digging into <u>automatic keyword extraction</u>, hope that I can use a more clever way to retrive keywords very soon.</div>
+    {% endcomment %}
+    <div id="wordcloud" style="text-align:center"></div>
+{% endblock content %}
+
+
+{% block after_content %}
+    <section style="background-color:#f17c72;color:black">
+        <div class="wrapper clearfix" style="margin-bottom:0">
+            <h2 style="text-align:center">您的意見，將是PTT Corpus進步的動力</h2>
+            <div style="text-align:center">
+                <a id='comment_button' class="btn btn-primary" type="button" href="#">我要留言</a>
+            </div>
+            <br>
+                {% if form %}
+                    <div id='comment_form' style="display:none;padding:30px;">
+                        <form  action="{% url 'index' %}" method="post" class="form-group">{% csrf_token %}
+                            {{form.as_p}}
+                            {% comment %}
+                            <div class="row" style="padding-bottom:20px;">
+                                <div class="col-xs-8">
+                                    {{form.username.label_tag}} {{form.username}}
+                                    {{form.message.label_tag}}
+                                    <textarea class="form-control" rows="3"></textarea> 
+                                </div>
+                            </div>
+                            {% endcomment %}
+                        <input type="submit" value="送出" class="btn btn-default"> 
+                    </div>
+                {% endif %}
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="comment_box">
+                        <p><span style="color:#896dc6">{{comment.username}}</span>  <span class="datetime">張貼於：{{comment.post_datetime|date:"Y-m-d H:i:s"}}</span>
+                        <br>
+                        {{comment.message}}</p>
+                    </div>
+
+                    {% if comment.reply %}
+                        <div class="uparrowdiv">
+                            阿吉：{{comment.reply}} <span class="datetime">回應於：{{comment.reply_datetime|date:"Y-m-d H:i:s"}}</span>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+        </div>
+        <br>
+    </section> 
+    <section style="background-color:#FFF380;color:black">
+        <div class="wrapper clearfix" style="margin-bottom:0;margin-top:0">
+            <h2 style="text-align:center;">Update Info</h2>
+
+            {% if update_log %}
+                <div class="update_log">
+                    {% for log in update_log %}
+                        <h3>{{log.update_datetime|date:"Y-m-d H:i:s"}}</h3>
+                        <p>{{log.update_message}}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% comment %}
+            <div class="update_log">
+                <h3>2015.01.07</h3>
+                Concordance 長條圖問題已修正
+                <hr>
+                <h3>2015.01.06</h3>
+                前幾天由於網路發生問題導致無法連線，敬請見諒，順便祝福大家新年快樂～
+                <hr>
+                <h3>2014.11.28</h3>
+                PTTCorp now provides <a href="{% url 'api' %}">API</a> for registered users!<br>
+                <hr>
+                <h3>2014.10.06</h3>
+                <h3>
+                Welcome to PTTCorp! <br>
+                You can find the slides <a href="http://140.112.147.131/static_ajiblog/html/PTT/slides.html" target="_blank">HERE</a>.<br>
+                If you want to contact me, please click <a href="{{intro_contact}}">HERE</a>.<br>
+                If you're interested in me, you can visit my <a href="http://140.112.147.131/ajiblog" target="_blank">blog</a>
+                </h3>
+                <hr>
+
+            </div>
+            {% endcomment %}
+        </div>
+    </section>
+
+{% endblock after_content %}
+
+{% block extra_js %}
+    {% comment %}
+    <script src="{% static 'wordcloud/d3.v3.min.js' %}" charset="utf-8"></script>
+    <script>
+
+    var cands = {{cands|safe}}
+    </script>
+    <script src="{% static 'wordcloud/d3.layout.cloud.js' %}"></script>
+    <script src="{% static 'wordcloud/wc_Hate.js' %}"></script>
+    {% endcomment %}
+
+  {% comment %}
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="https://rawgithub.com/jasondavies/d3-cloud/master/d3.layout.cloud.js"></script>
+  {% endcomment %}
+  
+    <script src="{% static 'wordcloud/d3.v3.min.js' %}" charset="utf-8"></script>
+    <script src="{% static 'wordcloud/d3.layout.cloud.js' %}"></script>
+    <script>
+        var words = {{cands|safe}} 
+    </script>
+    <script src="{% static 'wordcloud/wc_animated.js' %}"></script>
+
+    <script>
+        {% comment %}
+        $('#help').click(function () {$('#help_1').fadeIn();});
+        {% endcomment %}
+        $("#comment_button").click(function(){
+            $("#comment_form").toggle(200);
+            return false;
+         });
+    </script>
+    <script>
+        {% if user.is_authenticated %}
+            $('#id_username').attr('value', '{{user}}').attr('readonly', 'readonly');
+        {% else %}
+            $('#id_username').attr('value', '匿名');
+        {% endif %}
+    </script>
+{% endblock extra_js %}
+
+{% block extra_css %}
+    <style>
+        a#comment_button {color:white !important;} 
+        .comment_box {
+            padding:10px;
+            margin-bottom:20px;
+            line-height:180%;
+            background-color:whitesmoke;
+            -moz-border-radius: 25px 10px / 10px 25px;
+            border-radius: 25px 10px / 10px 25px;
+        }
+
+        .uparrowdiv {
+        width:50%;
+        min-height:40px; /*min height of DIV should be set to at least 2x the width of the arrow*/
+        background: #F0FFFF;
+        color: black;
+        padding:5px;
+        position:relative;
+        word-wrap:break-word;
+        -moz-border-radius:5px; /*add some nice CSS3 round corners*/
+        -webkit-border-radius:5px;
+        border-radius:5px;
+        margin-left:2em;
+        margin-bottom:2em;
+        }
+        
+        .uparrowdiv:after{ /*arrow added to uparrowdiv DIV*/
+        content:'';
+        display:block;
+        position:absolute;
+        top:-20px; /*should be set to -border-width x 2 */
+        left:30px;
+        width:0;
+        height:0;
+        border-color: transparent transparent #F0FFFF transparent; /*border color should be same as div div background color*/
+        border-style: solid;
+        border-width: 10px;        
+        }
+
+        .update_log {
+        background-color:#FFE87C;
+        height: 400px;
+        overflow: auto;
+        }
+
+        .datetime {
+        color: grey;
+        font-size: 11px;
+        }
+    </style>
+{% endblock %}
