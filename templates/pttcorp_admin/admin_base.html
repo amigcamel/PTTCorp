@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Admin
+{% endblock title %}
+
+{% block breadcrumb_wrapper %}
+{% endblock breadcrumb_wrapper %}
+
+{% block page_header %}
+<div class="wrapper">
+    <nav class="navbar navbar-default">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class="{% block update_log_active %}{% endblock update_log_active %}"><a href="{% url 'update_log' %}">Update Log<span class="sr-only"></span></a></li>
+            <li class="{% block message_board_active %}{% endblock message_board_active %}"><a href="{% url 'message_board' %}">Message Board</a></li>
+            {% comment %}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+                <li class="divider"></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+            {% endcomment %}
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+</div>
+{% endblock page_header %}
+
+{% block extra_css %}
+    <style>
+        a.btn:visited {color:white !important;}
+    </style>
+{% endblock extra_css %}

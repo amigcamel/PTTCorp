@@ -1,0 +1,157 @@
+{% extends "intro_base.html" %}
+{% load humanize %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Data" "intro_data" %}
+{% endblock %}
+
+{% block title %}{% block h1 %} Data {% endblock %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="http://mottie.github.io/tablesorter/css/theme.bootstrap.css" type="text/css" />
+<link rel="stylesheet" href="http://mottie.github.io/tablesorter/addons/pager/jquery.tablesorter.pager.css" type="text/css" />
+{% endblock %}
+
+{% block content %} 
+<table id="data-table" class="tablesorter" width="100%">
+<p><b>(Tip:</b> You can Sort multiple columns simultaneously by holding down the shift key and clicking other header)</p>
+
+    <caption>Database Details</caption>
+    <thead>
+        <tr>
+            <th>
+                Board
+            </th>
+            <th>
+                Posts
+            </th>
+            <th>
+                Last Update 
+            </th>
+            <th>
+                First Post
+            </th>
+            <th>
+                Raw Tokens
+            </th>
+            <th>
+                Raw Types
+            </th>
+            <th>
+                Word Tokens
+            </th>
+            <th>
+                Word Types
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for x in metainfo %}
+        <tr>
+            <td>
+                <a id="aji" href="#sub_{{x.board}}">{{x.board}}</a> ({{x.board_cht}})
+            </td>
+            <td>
+                {{x.post_number|intcomma}}
+            </td>
+            <td>
+                {{x.last_time|date:"Y-m-d"}}
+            </td>
+            <td>
+                {{x.first_time|date:"Y-m-d"}}
+            </td>
+            <td>
+                {{x.token_number|intcomma}}
+            </td>
+            <td>
+                {{x.type_number|intcomma}}
+            </td>
+            <td>
+                {{x.word_token_number|intcomma}}
+            </td>
+            <td>
+                {{x.word_type_number|intcomma}}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% for x in metainfo %}
+<table id="sub_{{x.board}}" class="tablesorter", width="100%" style="display:none">
+<caption>{{x.board}}</caption>
+    <thead>
+        <tr>
+            <th>
+                Year
+            </th>
+            <th>
+                Post Number
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for year, post_num in x.post_number_by_year.iteritems %}
+            <tr>
+                <td width="200px">
+                    {{year}}
+                </td>
+                <td width="200px">
+                    {{post_num}}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript" src="http://mottie.github.io/tablesorter/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="http://mottie.github.io/tablesorter/js/jquery.tablesorter.widgets.js"></script>
+<script type="text/javascript">
+// http://mottie.github.io/tablesorter/docs/example-widget-bootstrap-theme.html
+$(function() {
+  $.extend($.tablesorter.themes.bootstrap, {
+    // these classes are added to the table. To see other table classes available,
+    // look here: http://twitter.github.com/bootstrap/base-css.html#tables
+    table      : 'table table-bordered',
+    caption    : 'caption',
+    header     : 'bootstrap-header', // give the header a gradient background
+    footerRow  : '',
+    footerCells: '',
+    icons      : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+    sortNone   : 'bootstrap-icon-unsorted',
+    sortAsc    : 'icon-chevron-up glyphicon glyphicon-chevron-up',     // includes classes for Bootstrap v2 & v3
+    sortDesc   : 'icon-chevron-down glyphicon glyphicon-chevron-down', // includes classes for Bootstrap v2 & v3
+    active     : '', // applied when column is sorted
+    hover      : '', // use custom css here - bootstrap class may not override it
+    filterRow  : '', // filter row class
+    even       : '', // odd row zebra striping
+    odd        : ''  // even row zebra striping
+  });
+  // call the tablesorter plugin and apply the uitheme widget
+  $("table").tablesorter({
+    sortList: [[1, 1]],
+    // this will apply the bootstrap theme if "uitheme" widget is included
+    // the widgetOptions.uitheme is no longer required to be set
+    theme : "bootstrap",
+    widthFixed: true,
+    headerTemplate : '{content} {icon}', // new in v2.7. Needed to add the bootstrap icon!
+    // widget code contained in the jquery.tablesorter.widgets.js file
+    // use the zebra stripe widget if you plan on hiding any rows (filter widget)
+    widgets : [ "uitheme", "zebra" ],
+    widgetOptions : {
+    // using the default zebra striping class name, so it actually isn't included in the theme variable above
+    // this is ONLY needed for bootstrap theming if you are using the filter widget, because rows are hidden
+    zebra : ["even", "odd"],
+    // reset filters button
+    filter_reset : ".reset"
+    }
+  })
+});
+</script>
+
+{% endblock %}

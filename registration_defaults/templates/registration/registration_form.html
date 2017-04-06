@@ -1,0 +1,55 @@
+{% extends "registration/registration_base.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block breadcrumbs %}
+    {% clear_breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Register" "registration_register" %}
+{% endblock %}
+
+{% block title %}{% block h1 %}{% trans "Register" %}{% endblock %}{% endblock %}
+{% block content %}
+<h2> You can register with Facebook</h2>
+<form action="{% url 'facebook_connect' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="{{ request.path }}" name="next" />
+
+    <div id="facebook_login_js">
+    <input onclick="F.connect(this.parentNode.parentNode); return false;" type="image" src="{% static 'facebook/images/facebook_login.png' %}" />
+    </div>
+</form>
+<br>
+<h2>Or you can create an PTTCorp account</h2>
+<div class="row">
+  <div class="col-md-10">    
+      <form class="form form-horizontal" role="form" action="" method="post">{% csrf_token %}
+      {% for field in form %}
+       <div class="form-group">
+         <div class="col-md-8">
+          {{ field.label_tag }}
+          {% if field.errors %}
+          <span class="errorlist">{{ field.errors.as_text }}</span>
+          {% endif %}
+          {{ field }}
+          {% if field.help_text %}
+          <em>Note: {{ field.help_text }}</em>
+          {% endif %}
+          <hr>
+         </div>
+       </div>
+       {% endfor %}
+       <br>
+       <input class="btn btn-success" type="submit" value="{% trans "Send activation email" %}" /> 
+      </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$('#id_captcha_1').addClass("form-control")
+</script>
+<script src="{% static 'js/captcha.js' %}"></script>
+{% endblock %}

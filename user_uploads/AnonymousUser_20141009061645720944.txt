@@ -1,0 +1,95 @@
+#-*-coding:utf-8-*-
+from pymongo import Connection
+from openpyxl import Workbook
+from PyCCS import ckip
+import os
+import re
+
+C = Connection(host='localhost', port=27017)
+DB = C['PTT']
+
+def complaint(board):
+    os.system('mkdir yitai_%s' % board)
+    
+    res = DB[board].find()
+    con = []
+    
+    wb = Workbook()
+    ws = wb.active
+    cnt = 1
+    for cn in ['mongoid', 'Id', '版名', '日期', '推文數', '推文人數', '噓文數', '噓文人數', '推噓文總數']:
+        ws.cell(row=1, column=cnt).value = cn
+        cnt += 1
+    
+    rn = 2
+    for doc in res:
+        title = doc['title']  
+        if u'抱怨' in title and 'Re:' not in title and u'[新聞]' not in title:
+            try:
+                print title
+                mongoid = doc['_id']
+                post_time = doc['post_time']
+                post_time_cell = post_time.strftime("%Y-%m-%d %H:%M:%S")
+                post_time_file = post_time.strftime('%Y%m%d%H%M%S')
+                author = doc['author']
+                comments = doc['comments']
+                push = comments['push']
+                boo = comments['boo']
+                arrow = comments['arrow']
+                pusher = [i[0] for i in push]
+                booer = [i[0] for i in boo]
+                push_num = len(push)
+                boo_num = len(boo)
+                arrow_num = len(arrow)
+                pusher_num = len(set(pusher))
+                booer_num = len(set(booer))
+                comment_num = push_num + boo_num + arrow_num
+                content = doc['content']
+                #print '\x1b[33m'+content+'\x1b[0m'
+                if board == 'Anti-ramp':
+                    startpoint = u'五、事實經過：'
+                    endpoint = u'六、備註：'
+                    if startpoint in content:
+                        newstartpoint = content.index(startpoint)+7
+                    else:
+                        newstartpoint = 0
+                    if endpoint in content:
+                        newendpoint = content.index(endpoint)
+                    else:
+                        newendpoint = None
+                    if u'一、店名：' in content and startpoint not in content:
+                        pass
+                        #print '\n--\nignore!\n--\n'
+                    else:
+                        content = content[newstartpoint:newendpoint]
+                        #print content
+                        #raw_input('cont...')
+                elif board == 'Food':
+
+                    for x in [u'餐廳名稱', u'地址', u'電話', u'價位範圍']: 
+                        pat = re.compile('.*'+x+u'.*')
+
+                        if pat.search(content):
+                            content = re.sub(pat, '', content)              
+
+
+                try:
+                    content_seg = ckip.seg(content).nopos().encode('utf-8')
+                    #content_seg = '-NONE-'
+                    with open('yitai_%s/%s_%s_%s.txt' % (board, board, author, post_time_file), 'w') as f:
+                        f.write(content_seg)
+                    output = [str(mongoid), author, board, post_time_cell, push_num, pusher_num, boo_num, booer_num, comment_num]
+                    r = 2
+                    for bn, cn in enumerate(output, 1):
+                        ws.cell(row=rn, column=bn).value = cn
+                    rn += 1
+                    con.append(output)
+                except:
+                    print 'ignored!'
+                   
+            except:
+                print 'ignore error!'             
+#    return con      
+    
+    
+    wb.save('%s.xlsx' % board)

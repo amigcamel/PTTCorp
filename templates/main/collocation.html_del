@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}{% block h1 %} Collocation {% endblock %}{% endblock %}
+
+{% block content %}
+{% if form %}
+<div class="row">
+  <div class="col-md-10">    
+      <form class="form form-horizontal" role="form" action="{% url 'sketch.views.collocation' %}" method="post">{% csrf_token %}
+      {% for field in form %}
+       <div class="form-group">
+         <div class="col-md-5">
+          {{ field.label_tag }}
+          {% if field.errors %}
+          <span class="errorlist">{{ field.errors.as_text }}</span>
+          {% endif %}
+          {{ field }}
+         </div>
+       </div>
+       {% endfor %}
+       <br>
+       <input id="button" class="btn" type="submit" value="Submit" />
+      </form>
+  </div>
+</div>
+
+{% elif output %}
+
+<div> 
+    Query:
+    <div>
+        {{query}} 
+    </div>
+    Frequency:
+    <div> 
+        {{occ}}
+    </div>                                      
+</div>
+
+<div>  
+    {% for gramrel, collst in output.items %}
+    <div class="grid_4">
+        <div class="css_table">
+        <h2>{{gramrel}} ({{collst|length}})</h2>
+            <div class="css_table">
+                <div class="css_tr">
+                    <div class="css_td css_th">Collocates</div>
+                    <div class="css_td css_th">Frequency</div>
+                    <div class="css_td css_th">logDice</div>
+                </div>
+            </div> 
+
+            <div class="tblwrp">   
+            {% for coltup in collst %}
+            <div class="css_tr">
+                <div class="css_td">{{coltup.0}}</div>
+                <div class="css_td">{{coltup.1}}</div>
+                <div class="css_td">{{coltup.2|floatformat:4}}</div>
+            </div>
+          {% endfor %}
+            </div>
+        </div>
+    </div>  
+{% endfor %}
+</div>  
+{% endif %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .tblwrp {
+    overflow:scroll; 
+    height: 400px;
+} 
+.css_table {
+    display:table;
+    padding: 2px;
+}
+.css_tr {
+    display: table-row;                  
+}
+.css_td {
+    display: table-cell;
+    width: 130px;
+}
+.css_th {font-weight: 900; color:gray;}
+h2 {text-align:center; background-color:#F5F5F5;}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$('input[type="text"]').attr('class', 'form-control');
+</script>
+{% endblock %}

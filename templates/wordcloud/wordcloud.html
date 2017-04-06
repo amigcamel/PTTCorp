@@ -1,0 +1,38 @@
+{% extends "wordcloud_base.html" %}
+{% load staticfiles %}
+
+{% block h1 %}{% block title %}Wordcloud{% endblock %}{% endblock %}
+
+{% block content %}
+    {% if cands %}
+        <a href="{% url 'wordcloud_main' %}" class="btn btn-warning btn-lg">Go Back</a> 
+        <div style="text-align:center">
+            <h2>{{board_name.0}} ({{board_name.1}})</h2>
+	    <div id="wordcloud_Hate"></div>
+        </div>
+    {% else %}
+        <div style="text-align:center">
+            <h2>Generate wordcloud from:</h2>
+            <a href="{% url 'genWordcloud' 'Gossiping' %}" class="btn btn-primary btn-lg">Gossiping (八卦版)</a>
+            <a href="{% url 'genWordcloud' 'Hate' %}" class="btn btn-primary btn-lg">Hate (黑特版)</a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+    {% if cands %}
+        <script src="{% static 'wordcloud/d3.v3.min.js' %}" charset="utf-8"></script>
+        <script> 
+            var cands = {{cands|safe}}
+        </script>
+        <script src="{% static 'wordcloud/d3.layout.cloud.js' %}"></script>
+        <script src="{% static 'wordcloud/wc_Hate.js' %}"></script>
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        a.btn:visited {color:white;}
+    </style>
+{% endblock extra_css %}
+

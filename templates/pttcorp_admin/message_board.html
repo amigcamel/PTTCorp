@@ -1,0 +1,28 @@
+{% extends "admin_base.html" %}
+
+{% block message_board_active %}
+active
+{% endblock message_board_active %}
+
+{% block content %}
+    {% if reply_form %}
+        <h3>{{comment.username}} - {{comment.post_datetime|date:'Y-m-d H:i:s'}}</h3>
+        <p>{{comment.message}}</p>
+        <form action="." method="post" class="form-group">{% csrf_token %}
+            {{reply_form.as_p}}
+        <input type="submit" value="送出" class="btn btn-success">
+        <a href="{% url 'message_board' %}" class="btn btn-info">取消</a> 
+        </form>
+    {% else %}
+        {% for comment in comments %}
+            <h3>{{comment.username}} - {{comment.post_datetime|date:'Y-m-d H:i:s'}}</h3>
+            <p>{{comment.message}}</p>
+            {% if comment.reply %}
+                <p>Reply: {{comment.reply}}</p>
+            {% else %}
+                <a href="{% url 'messageBoardFunc' 'reply' comment.id %}" class="btn btn-warning">回應</a> 
+            {% endif %}
+            <hr>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}

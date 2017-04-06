@@ -1,0 +1,265 @@
+{% load staticfiles %}
+{% load tags %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% url "intro_main" as intro_main %}
+{% url "intro_data" as intro_data %}
+{% url "intro_contact" as intro_contact %}
+{% url "segmentation_main" as segmentation_main %}
+{% url "segmentation_jseg" as segmentation_jseg %}
+{% url "segmentation_pyccs" as segmentation_pyccs %}
+{% url "segmentation_segcom" as segmentation_segcom %}
+{% url "sketch_main" as sketch_main %}
+{% url "sketch_concordance" as sketch_concordance %}
+{% url "sketch_collocation" as sketch_collocation %}
+{% url "sentiment_main" as sentiment_main %}
+{% url "sentiment_sentipol" as sentiment_sentipol %}
+{% url "api" as api %}
+{% url "wordcloud_main" as wordcloud_main %}
+
+{% block breadcrumb_wrapper %}
+    {% block breadcrumbs %}
+        {% clear_breadcrumbs %}
+        {% breadcrumb "Home" "index" %}
+    {% endblock %}
+{% endblock breadcrumb_wrapper %}
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>PTTCorp | {% block title %}{% endblock %}</title>
+    <meta name="A linguistic tool for PTT">
+    <meta name="keywords" content="linguistics, linguists, PTT, 批踢踢, Taiwan Mandarin, natural language processing">
+
+    <!-- Mobile viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+    <link rel="shortcut icon" href="{% static "images/PTTCorp.ico" %}"  type="image/x-icon">
+
+    <!-- CSS-->
+    <!-- Google web fonts. You can get your own bundle at http://www.google.com/fonts. Don't forget to update the CSS accordingly!-->
+    <link href='http://fonts.googleapis.com/css?family=Droid+Serif|Ubuntu' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static "fancybox2/source/jquery.fancybox.css" %}" type="text/css" media="screen" />
+
+    <link rel="stylesheet" href="{% static "css/normalize.css" %}">
+    <link rel="stylesheet" href="{% static "js/flexslider/flexslider.css" %}">
+    <link rel="stylesheet" href="{% static "css/basic-style.css" %}">
+
+    <style>
+        .right {float: right; line-height: 1.4em; padding:10px; height: 45px;}
+        footer a:visited, footer a:active, footer a:hover {color:white;}
+    </style>
+    <style>
+        @import url(http://weloveiconfonts.com/api/?family=typicons);
+    
+        /* typicons */
+        [class*="typicons-"]:before {
+          font-family: 'Typicons', sans-serif;
+          font-size: 20px;
+          position: relative;
+          bottom: -20%;
+          left: -3%;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+    <!-- end CSS-->
+
+    <!-- JS-->
+    <script src="{% static "js/libs/modernizr-2.6.2.min.js" %}"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <!-- end JS-->
+
+</head>
+
+<body id="home">
+    <!-- Facebook plugin -->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=666382376793585&version=v2.0";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+    <!-- end Facebook plugin -->
+
+    <section id="top-bar">
+        <div class="wrapper clearfix" style="margin-top: 0em;">
+                <span class="toptableft"><a href="{% url 'index' %}">PTT Corpus</a></span>
+            {% if user.is_authenticated %}
+                <span class="toptabright"><a href="{% url "auth_logout" %}">Log out</a></span>
+                <span class="toptabright toptext">{{request.user}}</span>
+            {% else %}
+                <span class="toptabright"><a href="{% url "auth_login" %}">Log in</a></span>
+                <span class="toptabright"><a href="{% url "registration_register" %}">Register</a></span>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- header area -->
+    <header class="wrapper clearfix">
+
+        <div id="banner">        
+            <div id="logo"><a href="{% url "index" %}"><img src="{% static "images/PTTCorp.jpg" %}" alt="logo"></a></div> 
+        </div>
+
+        <!-- main navigation -->
+        <nav id="topnav" role="navigation">
+            <div class="menu-toggle">Menu</div>  
+            <ul class="srt-menu" id="menu-main-navigation">
+                <!-- <li><a href="{% url "index" %}">Home</a></li> -->
+                <li class="{% active request intro_main %}"><a href="{{intro_main}}"><span class="typicons-info">Intro</span></a>
+                    <ul>
+                        <li class="{% active request intro_data %}">
+                            <a href="{{intro_data}}">Data</a>
+                        </li>
+                        <li class="{% active request intro_contact %}">
+                            <a href="{{intro_contact}}">Contact</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="{% active request segmentation_main %}"><a href="#"><span class="typicons-cut">Segmentation</span></a>
+                    <ul>
+                        <li class="{% active request segmentation_jseg %}">
+                            <a href="{{segmentation_jseg}}">Jseg</a>
+                        </li>
+                        <li class="{% active request segmentation_pyccs %}">
+                            <a href="{{segmentation_pyccs}}">PyCCS</a>
+                        </li>
+                        <li class="{% active request segmentation_segcom %}">
+                            <a href="{{segmentation_segcom}}">Segcom</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="{% active request sketch_main %}"><a href="#"><span class="typicons-spanner">Tools</span></a>
+                    <ul>
+                        <li class="{% active request sketch_concordance %}">
+                            <a href="{{sketch_concordance}}">Concordance</a>
+                        </li>
+                        <li class="{% active request sketch_collocation %}">
+                            <a href="{{sketch_collocation}}">Collocation</a>
+                        </li>
+                        <li>
+                            <a href="{{sentiment_sentipol}}">Sentipol</a>
+                        </li>
+                    </ul>
+                </li>
+<!--
+                <li class="{% active request sentiment_main %}"><a href="#">Sentiment</a>
+                    <ul>
+                        <li class="{% active request sentiment_sentipol %}">
+                            <a href="{{sentiment_sentipol}}">Sentipol</a>
+                        </li>
+                    </ul>
+                </li>
+-->
+                <li class="{% active request api %}"><a href="{{api}}"><span class="typicons-sync">API</span></a>
+               	<li class="{% active request wordcloud_main %}"><a href="{{wordcloud_main}}"><span class="typicons-star">Wordcloud</span></a>
+                </li>
+                    {% comment %}
+                        {% if user.is_authenticated %}
+                            <a href="{% url "auth_logout" %}" class="btn btn-default right">Log out</a>
+                        {% else %}
+                            <a href="{% url "auth_login" %}" class="btn btn-default right">Log in</a>
+                            <a href="{% url "registration_register" %}" class="btn btn-default right">Register</a>
+                        {% endif %}
+                    {% endcomment %}
+            </ul>    
+        </nav><!-- #topnav -->
+    </header><!-- end header -->
+
+    {% block page_header %}
+    <section id="page-header" class="clearfix">    
+        <div class="wrapper">
+            <h1 class="header_h1">{% block h1 %}{% endblock %}</h1>
+        </div>
+    </section>
+    {% endblock page_header %}
+
+    <!-- main content area -->   
+    <div class="wrapper" id="main"> 
+        <section id="content" class="wide-content">
+            <div class="clearfix">
+            {% render_breadcrumbs %} 
+            {% for message in flash.notice %}
+                <span class="errorlist">{{ message }}</span>
+            {% endfor %}
+
+            {% block content %}{% endblock %}
+            </div>
+        </section>
+    </div><!-- #end div #main .wrapper -->
+
+    {% block after_content %}
+    {% endblock after_content %}
+
+    <!-- footer area -->    
+    <footer>
+        <div id="colophon" class="wrapper clearfix">
+            <div class="grid_8">
+                {% comment %}
+                <div>
+                    Copyright © 2014 - All Rights Reserved - <a href="http://lope.linguistics.ntu.edu.tw/">LOPE Lab, Graduate Institutue of Linguistics, National Taiwan University</a>
+                </div>
+                {% endcomment %}
+
+
+                <div>
+                    <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/"><img alt="創用 CC 授權條款" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/tw/88x31.png" /></a> 本著作係採用<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/tw/">創用 CC 姓名標示-非商業性-相同方式分享 3.0 台灣 授權條款</a>授權.
+                </div>
+                <div>
+                    <a href="http://lope.linguistics.ntu.edu.tw/LOPEN/" target="_blank">LOPEN Project -- 語言,本體資源與知識開放計劃</a>
+                </div>
+                <div>
+                    <a href="/copens">Corpora Open and Search (COPENS) -- 開放語料庫與搜尋工具</a>
+                </div>
+                <div>
+                    Built by: Aji (amigcamel@gmail.com)
+                </div>
+            <!--You can NOT remove this attribution statement from any page, unless you get the permission from prowebdesign.ro--><div id="attribution" style="color:#666; font-size:11px;">Site built with <a href="http://www.prowebdesign.ro/simple-responsive-template/" target="_blank" title="Simple Responsive Template is a free software by www.prowebdesign.ro" style="color:#777;">Simple Responsive Template</a></div><!--end attribution-->
+                <div class="fb-like" data-href="http://lopen.linguistics.ntu.edu.tw/PTT" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false" style="overflow:hidden;width:90px;"></div> 
+            </div>
+            <div class="grid_4">
+
+            </div>
+        </div>
+    </footer><!-- #end footer area --> 
+
+
+
+
+    <!-- jQuery UI -->
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+    {% comment %}
+        <script>window.jQuery || document.write('<script src="js/libs/jquery-1.9.0.min.js">\x3C/script>')</script>
+    {% endcomment %}
+    <script defer src="{% static "js/flexslider/jquery.flexslider-min.js" %}"></script>
+
+    <script type="text/javascript" src="{% static "fancybox2/source/jquery.fancybox.js" %}"></script>
+
+
+    <!-- fire ups - read this file!  -->   
+    <script src="{% static "js/main.js" %}"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(".fancybox").fancybox();
+            $('section').tooltip({track:true});
+        });
+    </script>
+    <script>
+        $('textarea').attr('class', 'form-control');
+        $('span[class="divider"]').remove();
+    </script>
+        {% block extra_js %}{% endblock %}
+
+</body>
+</html>

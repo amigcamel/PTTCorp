@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}
+
+{% block update_log_active %}
+active
+{% endblock update_log_active %}
+
+{% block content %}
+    {% if form %}
+        <form  action="{% url 'update_log' %}" method="post" class="form-group">{% csrf_token %}
+            {{form.as_p}}
+        <input type="submit" value="送出" class="btn btn-default">
+    {% endif %}
+
+    <hr>
+    
+    {% if edit_form %}
+        <form  action="."  method="post" class="form-group">{% csrf_token %}
+            {{edit_form.as_p}}
+        <input type="submit" value="送出" class="btn btn-success">
+        <a href="{% url 'update_log' %}" class="btn btn-info">取消修改</a>
+    {% endif %}
+
+
+    {% if update_log %}
+        <h2>Update log</h2>
+        {% for log in update_log %}
+            <h3>{{log.update_datetime|date:'Y-m-d H:i:s'}}</h3>
+            <p>{{log.update_message|safe}}</p>
+            <a href="{% url 'updateLogFunc' 'modify' log.id %}" class="btn btn-warning">修改</a>
+            <a href="{% url 'updateLogFunc' 'delete' log.id %}" onclick="return confirm('確定刪除？')" class="btn btn-danger">刪除</a>
+            <hr>
+        {% endfor %}
+    {% endif %}
+
+
+{% endblock content %}
