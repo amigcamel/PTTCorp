@@ -97,7 +97,7 @@ class Cqp(object):
             rw = words[end:end+self.window_size]
             qw = words[start:end]
 
-            if show_pos == True:
+            if show_pos is True:
                 lp = postags[start-self.window_size:start]
                 rp = postags[end:end+self.window_size]
                 qp = postags[start:end]             
@@ -106,7 +106,7 @@ class Cqp(object):
                 mid = ' '.join(['%s<span>/%s</span>' % (word, pos) for word, pos in zip(qw, qp)])
                 right = ' '.join(['%s<span>/%s</span>' % (word, pos) for word, pos in zip(rw, rp)])     
 
-            elif show_pos == False:
+            elif show_pos is False:
                 left = ' '.join(['%s' % word for word in lw])
                 mid = ' '.join(['%s' % word for word in qw])
                 right = ' '.join(['%s' % word for word in rw])     
@@ -114,8 +114,6 @@ class Cqp(object):
 
 #           s_bounds = sentences.find_pos(end-1)
             mongoid = ids.find_pos(start)[-1]
-            
-            
             if self.corpus_name == 'PTT':
                 self.freq_by_year[int(ptime[:4])] += 1
             output['conc'] = (left, mid, right)
@@ -130,8 +128,9 @@ class Cqp(object):
             rev = False
         else:
             raise ValueError('time order should be either 1 or -1')
-        self.conclst.sort(key=lambda x:x['post_time'], reverse=rev)
+        self.conclst.sort(key=lambda x: x['post_time'], reverse=rev)
 
         if self.corpus_name == 'PTT':
             for y in self.freq_by_year.iterkeys():
-                self.freq_by_year[y] = self.freq_by_year[y]/toknumByYear[str(y)]
+                if y in self.freq_by_year and y in toknumByYear:
+                    self.freq_by_year[y] = self.freq_by_year[y]/toknumByYear[str(y)]
