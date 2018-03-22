@@ -1,4 +1,4 @@
-
+G
 # Created by https://www.gitignore.io/api/osx,vim,linux,bower,django,python
 
 ### Bower ###
@@ -168,3 +168,4 @@ tags
 #
 static_pttcorp
 deploy/*
+images/*
