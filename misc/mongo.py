@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 def connect(db, collection):
-    client = MongoClient('140.112.147.132')
+    client = MongoClient('140.112.147.121')
     client.admin.authenticate('achiii', 'gjoKClmg8eQDF4pKeVXMkTnX7wL/9MVilkavArDouNA=')
     output = client[db][collection]
     return output
