@@ -11,6 +11,8 @@ from pttcorp_comments.models import CommentModel
 import datetime
 
 REDIRECT_URL = 'index'
+
+
 def super_user_auth(func):
     def check_super_user(*args, **kwargs):
         if args[0].user.is_superuser:
@@ -20,7 +22,7 @@ def super_user_auth(func):
     return check_super_user
 
 
-@super_user_auth            
+@super_user_auth
 def updateLogView(request):
     update_log = UpdateLogModel.objects.all()
     update_log = reversed(update_log)
@@ -33,7 +35,11 @@ def updateLogView(request):
         return HttpResponseRedirect(reverse('update_log'))
     else:
         form = UpdateLogModelForm()
-    return render_to_response('update_log.html', {'form':form, 'update_log':update_log}, context_instance=RequestContext(request))
+    return render_to_response('update_log.html',
+                              {'form': form,
+                               'update_log': update_log},
+                              context_instance=RequestContext(request))
+
 
 @super_user_auth
 def updateLogFunc(request, func, db_id):
@@ -44,12 +50,15 @@ def updateLogFunc(request, func, db_id):
         edit_form = UpdateLogModelForm(request.POST)
         if edit_form.is_valid():
             mod_message = edit_form.cleaned_data['update_message']
-            obj.update_message = mod_message 
+            obj.update_message = mod_message
             obj.save()
             return HttpResponseRedirect(reverse('update_log'))
         else:
-            edit_form = UpdateLogModelForm(initial={'update_message':ori_msg})
-        return render_to_response('update_log.html', {'edit_form':edit_form, 'update_log':update_log}, context_instance=RequestContext(request))
+            edit_form = UpdateLogModelForm(initial={'update_message': ori_msg})
+        return render_to_response('update_log.html',
+                                  {'edit_form': edit_form,
+                                   'update_log': update_log},
+                                  context_instance=RequestContext(request))
     elif func == 'delete':
         UpdateLogModel.objects.filter(id=db_id).delete()
     else:
@@ -57,10 +66,15 @@ def updateLogFunc(request, func, db_id):
     return HttpResponseRedirect(reverse('update_log'))
 
 #@user_passes_test(test_func=lambda u: u.is_superuser, login_url='index')
+
+
 @super_user_auth
 def messageBoardView(request):
     comments = reversed(CommentModel.objects.all())
-    return render_to_response('message_board.html', {'comments':comments}, context_instance=RequestContext(request))
+    return render_to_response('message_board.html',
+                              {'comments': comments},
+                              context_instance=RequestContext(request))
+
 
 @super_user_auth
 def messageBoardFunc(request, func, db_id):
@@ -70,9 +84,12 @@ def messageBoardFunc(request, func, db_id):
         if reply_form.is_valid():
             reply = reply_form.cleaned_data['reply']
             comment.reply = reply
-            comment.reply_datetime = datetime.datetime.now() 
+            comment.reply_datetime = datetime.datetime.now()
             comment.save()
             return HttpResponseRedirect(reverse('message_board'))
     else:
-        reply = CommentModelReplyForm() 
-    return render_to_response('message_board.html', {'reply_form': reply_form, 'comment':comment}, context_instance=RequestContext(request))
+        reply = CommentModelReplyForm()
+    return render_to_response('message_board.html',
+                              {'reply_form': reply_form,
+                               'comment': comment},
+                              context_instance=RequestContext(request))

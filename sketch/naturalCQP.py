@@ -6,17 +6,17 @@ def ncqp(s):
     if not isinstance(s, unicode):
         try:
             s = s.decode('utf-8')
-        except:
+        except BaseException:
             raise
     combinatorics = itertools.product([True, False], repeat=len(s) - 1)
-    
+
     solution = []
     for combination in combinatorics:
         i = 0
         one_such_combination = [s[i]]
         for slab in combination:
             i += 1
-            if not slab: # there is a join
+            if not slab:  # there is a join
                 one_such_combination[-1] += s[i]
             else:
                 one_such_combination += [s[i]]
@@ -25,14 +25,10 @@ def ncqp(s):
     return res
 
 
-
-
-
-
 #import re
 #
 #
-#def ncqp(s):
+# def ncqp(s):
 #    if not isinstance(s, unicode):
 #        try:
 #            s = s.decode('utf-8')
@@ -56,4 +52,3 @@ def ncqp(s):
 #     else:
 #         output = string
 #     print output
-    

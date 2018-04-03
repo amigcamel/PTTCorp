@@ -10,6 +10,7 @@ from registration.views import RegistrationView as BaseRegistrationView
 from sendmail import gmail
 import time
 
+
 class RegistrationView(BaseRegistrationView):
     """
     A registration backend which follows a simple workflow:
@@ -47,8 +48,9 @@ class RegistrationView(BaseRegistrationView):
     an instance of ``registration.models.RegistrationProfile``. See
     that model and its custom manager for full documentation of its
     fields and supported operations.
-    
+
     """
+
     def register(self, request, **cleaned_data):
         """
         Given a username, email address and password, register a new
@@ -78,13 +80,14 @@ class RegistrationView(BaseRegistrationView):
             site = Site.objects.get_current()
         else:
             site = RequestSite(request)
-        new_user = RegistrationProfile.objects.create_inactive_user(username, email,
-                                                                    password, site)
+        new_user = RegistrationProfile.objects.create_inactive_user(
+            username, email, password, site)
         signals.user_registered.send(sender=self.__class__,
                                      user=new_user,
                                      request=request)
         subject = 'PTTCorp registration notification'
-        text = '"%s | %s | %s | %s" ' % (username, email, password, time.ctime())
+        text = '"%s | %s | %s | %s" ' % (
+            username, email, password, time.ctime())
         gmail(subject, text)
         return new_user
 
@@ -99,7 +102,7 @@ class RegistrationView(BaseRegistrationView):
 
         * If ``REGISTRATION_OPEN`` is both specified and set to
           ``False``, registration is not permitted.
-        
+
         """
         return getattr(settings, 'REGISTRATION_OPEN', True)
 
@@ -107,7 +110,7 @@ class RegistrationView(BaseRegistrationView):
         """
         Return the name of the URL to redirect to after successful
         user registration.
-        
+
         """
         return ('registration_complete', (), {})
 
@@ -122,9 +125,10 @@ class ActivationView(BaseActivationView):
         ``registration.signals.user_activated`` will be sent, with the
         newly activated ``User`` as the keyword argument ``user`` and
         the class of this backend as the sender.
-        
+
         """
-        activated_user = RegistrationProfile.objects.activate_user(activation_key)
+        activated_user = RegistrationProfile.objects.activate_user(
+            activation_key)
         if activated_user:
             signals.user_activated.send(sender=self.__class__,
                                         user=activated_user,

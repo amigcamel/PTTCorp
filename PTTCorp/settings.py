@@ -9,7 +9,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os, glob
+import os
+import glob
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -20,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = 'p&&a0l3o5s#*#^$9g9^boio&$us(6687dvq3sa5^^6o*qldl@*'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = True
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -118,15 +119,17 @@ USE_TZ = True
 
 STATIC_URL = '/static_pttcorp/'
 STATICFILES_DIRS = (
-            os.path.join(os.path.dirname(os.path.dirname(__file__)),'static'),
-        )
+    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static'),
+)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_pttcorp')
 
-UPLOADFILES_DIRS = os.path.join(os.path.dirname(os.path.dirname(__file__)),'user_uploads')
+UPLOADFILES_DIRS = os.path.join(
+    os.path.dirname(
+        os.path.dirname(__file__)),
+    'user_uploads')
 
 
-
-#TEMPLATE PATH
+# TEMPLATE PATH
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'registration_defaults/templates/registration'),
 )

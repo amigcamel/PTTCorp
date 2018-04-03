@@ -16,7 +16,10 @@ def genWordcloud(request, board_name):
         from main.views import cands_ori
         cands = json.dumps(cands_ori)
     elif board_name == 'Hate':
-        with open('/var/www/PTTCorp/static/wordcloud/Hate_.json') as jf: 
+        with open('/var/www/PTTCorp/static/wordcloud/Hate_.json') as jf:
             cands = jf.read()
     board_name = (board_name, data[board_name])
-    return render_to_response('wordcloud.html', {'cands':cands, 'board_name':board_name},context_instance=RequestContext(request)) 
+    return render_to_response('wordcloud.html',
+                              {'cands': cands,
+                               'board_name': board_name},
+                              context_instance=RequestContext(request))
