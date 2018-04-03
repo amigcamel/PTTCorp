@@ -13,7 +13,6 @@ import os
 import glob
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -84,7 +82,6 @@ ROOT_URLCONF = 'PTTCorp.urls'
 
 WSGI_APPLICATION = 'PTTCorp.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
@@ -108,7 +105,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
@@ -118,24 +114,18 @@ USE_TZ = True
 # )
 
 STATIC_URL = '/static_pttcorp/'
-STATICFILES_DIRS = (
-    os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static'),
-)
+STATICFILES_DIRS = (os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), 'static'), )
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_pttcorp')
 
 UPLOADFILES_DIRS = os.path.join(
-    os.path.dirname(
-        os.path.dirname(__file__)),
-    'user_uploads')
-
+    os.path.dirname(os.path.dirname(__file__)), 'user_uploads')
 
 # TEMPLATE PATH
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'registration_defaults/templates/registration'),
-)
+TEMPLATE_DIRS = (os.path.join(
+    BASE_DIR, 'registration_defaults/templates/registration'), )
 
 TEMPLATE_DIRS += tuple(glob.glob(os.path.join(BASE_DIR, 'templates/*')))
-
 
 ALLOWED_HOSTS = ['lopen.linguistics.ntu.edu.tw', '140.112.147.121']
 SITE_ID = 1
@@ -153,13 +143,10 @@ LOGIN_REDIRECT_URL = 'index'
 ENDLESS_PAGINATION_PER_PAGE = 100
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_THROTTLE_CLASSES': (
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ),
+    'DEFAULT_PERMISSION_CLASSES':
+    ('rest_framework.permissions.IsAuthenticated', ),
+    'DEFAULT_THROTTLE_CLASSES': ('rest_framework.throttling.AnonRateThrottle',
+                                 'rest_framework.throttling.UserRateThrottle'),
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/day',
         'user': '20/minute'
@@ -176,8 +163,10 @@ LOGGING = {
     'version': 1,
     'formatters': {
         'standard': {
-            'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt': "%d/%b/%Y %H:%M:%S"
+            'format':
+            "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt':
+            "%d/%b/%Y %H:%M:%S"
         },
     },
     'handlers': {

@@ -21,7 +21,6 @@ try:
 except ImportError:
     datetime_now = datetime.datetime.now
 
-
 SHA1_RE = re.compile('^[a-f0-9]{40}$')
 
 
@@ -71,8 +70,12 @@ class RegistrationManager(models.Manager):
                 return user
         return False
 
-    def create_inactive_user(self, username, email, password,
-                             site, send_email=True):
+    def create_inactive_user(self,
+                             username,
+                             email,
+                             password,
+                             site,
+                             send_email=True):
         """
         Create a new, inactive ``User``, generate a
         ``RegistrationProfile`` and email its activation key to the
@@ -92,6 +95,7 @@ class RegistrationManager(models.Manager):
             registration_profile.send_activation_email(site)
 
         return new_user
+
     create_inactive_user = transaction.commit_on_success(create_inactive_user)
 
     def create_profile(self, user):
@@ -109,8 +113,7 @@ class RegistrationManager(models.Manager):
         if isinstance(username, unicode):
             username = username.encode('utf-8')
         activation_key = hashlib.sha1(salt + username).hexdigest()
-        return self.create(user=user,
-                           activation_key=activation_key)
+        return self.create(user=user, activation_key=activation_key)
 
     def delete_expired_users(self):
         """
@@ -219,6 +222,7 @@ class RegistrationProfile(models.Model):
             days=settings.ACCOUNT_ACTIVATION_DAYS)
         return self.activation_key == self.ACTIVATED or \
             (self.user.date_joined + expiration_date <= datetime_now())
+
     activation_key_expired.boolean = True
 
     def send_activation_email(self, site):
@@ -259,9 +263,11 @@ class RegistrationProfile(models.Model):
             framework for details regarding these objects' interfaces.
 
         """
-        ctx_dict = {'activation_key': self.activation_key,
-                    'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
-                    'site': site}
+        ctx_dict = {
+            'activation_key': self.activation_key,
+            'expiration_days': settings.ACCOUNT_ACTIVATION_DAYS,
+            'site': site
+        }
         subject = render_to_string('registration/activation_email_subject.txt',
                                    ctx_dict)
         # Email subject *must not* contain newlines

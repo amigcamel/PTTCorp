@@ -16,27 +16,17 @@ class Cqp(object):
         self.time_order = time_order
         self.freq_by_month = OrderedDict()
         ms = [
-            201406,
-            201407,
-            201408,
-            201409,
-            201410,
-            201411,
-            201412,
-            201501,
-            201502,
-            201503,
-            201504,
-            201505]
+            201406, 201407, 201408, 201409, 201410, 201411, 201412, 201501,
+            201502, 201503, 201504, 201505
+        ]
         for m in ms:
             self.freq_by_month[m] = 0
 
-    def find(
-            self,
-            token,
-            begin_time=20140601,
-            end_time=20150531,
-            board_list=['Gossiping']):
+    def find(self,
+             token,
+             begin_time=20140601,
+             end_time=20150531,
+             board_list=['Gossiping']):
         if begin_time:
             if not isinstance(begin_time, int):
                 raise TypeError('"begin_time" should be an "int"')
@@ -50,8 +40,7 @@ class Cqp(object):
         self.conclst = []
         registry_dir = '/usr/local/share/cwb/registry'
         cqp = PyCQP_interface.CQP(
-            bin='/usr/local/bin/cqp',
-            options='-c -r ' + registry_dir)
+            bin='/usr/local/bin/cqp', options='-c -r ' + registry_dir)
         cqp.Exec(self.corpus_name + ";")
         cqp.Query('[word="%s"];' % token)
 

@@ -9,14 +9,13 @@ from functools import partial
 DateInput = partial(forms.DateInput, {'class': 'datepicker'})
 
 from misc.mongo import connect
-BOARDS = connect('PTTmeta', 'info').find(
-    {}, {'board': 1, 'board_cht': 1, '_id': 0})
-BOARDS = [
-    (i['board'],
-     i['board_cht']) if 'board_cht' in i else (
-        i['board'],
-        i['board']) for i in BOARDS]
-
+BOARDS = connect('PTTmeta', 'info').find({}, {
+    'board': 1,
+    'board_cht': 1,
+    '_id': 0
+})
+BOARDS = [(i['board'], i['board_cht'])
+          if 'board_cht' in i else (i['board'], i['board']) for i in BOARDS]
 
 # http://stackoverflow.com/a/16523287/1105489
 from django.forms.widgets import RadioFieldRenderer
@@ -36,10 +35,10 @@ class RadioFieldWithoutULRenderer(RadioFieldRenderer):
 
 class ConcordanceForm(forms.Form):
     query = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': "ex:強者我朋友",
-                "required": "required"}),
+        widget=forms.TextInput(attrs={
+            'placeholder': "ex:強者我朋友",
+            "required": "required"
+        }),
         min_length=1,
         max_length=100)
     boards = forms.MultipleChoiceField(
@@ -47,28 +46,17 @@ class ConcordanceForm(forms.Form):
     window_size = forms.IntegerField(
         max_value=10,
         min_value=4,
-        widget=forms.NumberInput(
-            attrs={
-                'style': 'display:none'}))
+        widget=forms.NumberInput(attrs={'style': 'display:none'}))
     corpus = forms.ChoiceField(
-        choices=[
-            ('PTT',
-             'Article (文章)'),
-            ('PTTCOM',
-             'Comments (推噓文)')],
+        choices=[('PTT', 'Article (文章)'), ('PTTCOM', 'Comments (推噓文)')],
         widget=forms.RadioSelect())  # attrs={'disabled':'disabled'}))
     time_order = forms.ChoiceField(
-        choices=[
-            (-1,
-             'Descending'),
-            (1,
-             'Ascending')],
-        widget=forms.RadioSelect(
-            renderer=RadioFieldWithoutULRenderer))
+        choices=[(-1, 'Descending'), (1, 'Ascending')],
+        widget=forms.RadioSelect(renderer=RadioFieldWithoutULRenderer))
     POS = forms.ChoiceField(
-        choices=[
-            ('True', 'Show'), ('False', 'Hide')], widget=forms.RadioSelect(
-            renderer=RadioFieldWithoutULRenderer), label="Part-of-Speech")
+        choices=[('True', 'Show'), ('False', 'Hide')],
+        widget=forms.RadioSelect(renderer=RadioFieldWithoutULRenderer),
+        label="Part-of-Speech")
     start_date = forms.DateField(widget=DateInput(), required=False)
     end_date = forms.DateField(widget=DateInput(), required=False)
 
@@ -98,8 +86,6 @@ class ConcordanceForm(forms.Form):
 
 class CollocationForm(forms.Form):
     query = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'ex:服貿'}),
+        widget=forms.TextInput(attrs={'placeholder': 'ex:服貿'}),
         min_length=1,
         max_length=10)

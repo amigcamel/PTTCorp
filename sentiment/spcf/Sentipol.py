@@ -37,6 +37,7 @@ def sentipol(post_seg):
 
 # loading Emotion Lexicon (情緒詞表)
 print 'loading Emotion Lexicon (情緒詞表)...'
-with open(join(CUR_PATH, 'jieba_user_dict/dics/emo_pos.json')) as fp, open(join(CUR_PATH, 'jieba_user_dict/dics/emo_neg_ex.json')) as fn:
+with open(join(CUR_PATH, 'jieba_user_dict/dics/emo_pos.json')) as fp, open(
+        join(CUR_PATH, 'jieba_user_dict/dics/emo_neg_ex.json')) as fn:
     pos_lst = json.load(fp)
     neg_lst = json.load(fn)

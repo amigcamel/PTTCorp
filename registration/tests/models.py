@@ -17,13 +17,15 @@ class RegistrationModelTests(TestCase):
     Test the model and manager used in the default backend.
 
     """
-    user_info = {'username': 'alice',
-                 'password': 'swordfish',
-                 'email': 'alice@example.com'}
+    user_info = {
+        'username': 'alice',
+        'password': 'swordfish',
+        'email': 'alice@example.com'
+    }
 
     def setUp(self):
-        self.old_activation = getattr(
-            settings, 'ACCOUNT_ACTIVATION_DAYS', None)
+        self.old_activation = getattr(settings, 'ACCOUNT_ACTIVATION_DAYS',
+                                      None)
         settings.ACCOUNT_ACTIVATION_DAYS = 7
 
     def tearDown(self):
@@ -42,8 +44,8 @@ class RegistrationModelTests(TestCase):
         self.assertEqual(RegistrationProfile.objects.count(), 1)
         self.assertEqual(profile.user.id, new_user.id)
         self.failUnless(re.match('^[a-f0-9]{40}$', profile.activation_key))
-        self.assertEqual(unicode(profile),
-                         "Registration information for alice")
+        self.assertEqual(
+            unicode(profile), "Registration information for alice")
 
     def test_activation_email(self):
         """
@@ -86,7 +88,9 @@ class RegistrationModelTests(TestCase):
 
         """
         new_user = RegistrationProfile.objects.create_inactive_user(
-            site=Site.objects.get_current(), send_email=False, **self.user_info)
+            site=Site.objects.get_current(),
+            send_email=False,
+            **self.user_info)
         self.assertEqual(len(mail.outbox), 0)
 
     def test_unexpired_account(self):
@@ -156,9 +160,8 @@ class RegistrationModelTests(TestCase):
         self.failIf(new_user.is_active)
 
         profile = RegistrationProfile.objects.get(user=new_user)
-        self.assertNotEqual(
-            profile.activation_key,
-            RegistrationProfile.ACTIVATED)
+        self.assertNotEqual(profile.activation_key,
+                            RegistrationProfile.ACTIVATED)
 
     def test_activation_invalid_key(self):
         """
@@ -180,8 +183,7 @@ class RegistrationModelTests(TestCase):
 
         profile = RegistrationProfile.objects.get(user=new_user)
         self.failIf(
-            RegistrationProfile.objects.activate_user(
-                profile.activation_key))
+            RegistrationProfile.objects.activate_user(profile.activation_key))
 
     def test_activation_nonexistent_key(self):
         """

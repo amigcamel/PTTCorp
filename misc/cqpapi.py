@@ -7,15 +7,19 @@ import os
 import re
 from mongo import connect
 
-BOARDREF = connect('PTTmeta', 'info').find(
-    {}, {'_id': 0, 'board': 1, 'board_cht': 1})
-BOARDREF = dict([(i['board'], i['board_cht']) if 'board_cht' in i else (
-    i['board'], i['board']) for i in BOARDREF])
+BOARDREF = connect('PTTmeta', 'info').find({}, {
+    '_id': 0,
+    'board': 1,
+    'board_cht': 1
+})
+BOARDREF = dict([(i['board'], i['board_cht'])
+                 if 'board_cht' in i else (i['board'], i['board'])
+                 for i in BOARDREF])
 
-toknumByYear = connect(
-    'PTTmeta', 'meta').find(
-        {}, {
-            '_id': 0, 'toknumByYear': 1})
+toknumByYear = connect('PTTmeta', 'meta').find({}, {
+    '_id': 0,
+    'toknumByYear': 1
+})
 toknumByYear = toknumByYear.next()['toknumByYear']
 
 
@@ -26,14 +30,13 @@ class Cqp(object):
         self.time_order = time_order
         self.freq_by_year = dict()
 
-    def find(
-            self,
-            token,
-            rsize=None,
-            show_pos=False,
-            begin_time=None,
-            end_time=None,
-            board_list=None):
+    def find(self,
+             token,
+             rsize=None,
+             show_pos=False,
+             begin_time=None,
+             end_time=None,
+             board_list=None):
         if begin_time:
             if not isinstance(begin_time, int):
                 raise TypeError('"begin_time" should be an "int"')
@@ -49,8 +52,7 @@ class Cqp(object):
         self.conclst = []
         registry_dir = '/usr/local/share/cwb/registry'
         cqp = PyCQP_interface.CQP(
-            bin='/usr/local/bin/cqp',
-            options='-c -r ' + registry_dir)
+            bin='/usr/local/bin/cqp', options='-c -r ' + registry_dir)
         cqp.Exec(self.corpus_name + ";")
         if token.startswith('['):
             wildcard = '.'
@@ -77,6 +79,7 @@ class Cqp(object):
             pass
         else:
             raise
+
     # sentences = corpus.attribute("s","s") -> find position in sentences
     # (line number)
         ids = corpus.attribute("text_id", "s")
@@ -118,12 +121,18 @@ class Cqp(object):
                 rp = postags[end:end + self.window_size]
                 qp = postags[start:end]
 
-                left = ' '.join(['%s<span>/%s</span>' % (word, pos)
-                                 for word, pos in zip(lw, lp)])
-                mid = ' '.join(['%s<span>/%s</span>' % (word, pos)
-                                for word, pos in zip(qw, qp)])
-                right = ' '.join(['%s<span>/%s</span>' % (word, pos)
-                                  for word, pos in zip(rw, rp)])
+                left = ' '.join([
+                    '%s<span>/%s</span>' % (word, pos)
+                    for word, pos in zip(lw, lp)
+                ])
+                mid = ' '.join([
+                    '%s<span>/%s</span>' % (word, pos)
+                    for word, pos in zip(qw, qp)
+                ])
+                right = ' '.join([
+                    '%s<span>/%s</span>' % (word, pos)
+                    for word, pos in zip(rw, rp)
+                ])
 
             elif show_pos is False:
                 left = ' '.join(['%s' % word for word in lw])

@@ -75,19 +75,19 @@ class RegistrationView(BaseRegistrationView):
         class of this backend as the sender.
 
         """
-        username, email, password = cleaned_data['username'], cleaned_data['email'], cleaned_data['password1']
+        username, email, password = cleaned_data['username'], cleaned_data[
+            'email'], cleaned_data['password1']
         if Site._meta.installed:
             site = Site.objects.get_current()
         else:
             site = RequestSite(request)
         new_user = RegistrationProfile.objects.create_inactive_user(
             username, email, password, site)
-        signals.user_registered.send(sender=self.__class__,
-                                     user=new_user,
-                                     request=request)
+        signals.user_registered.send(
+            sender=self.__class__, user=new_user, request=request)
         subject = 'PTTCorp registration notification'
-        text = '"%s | %s | %s | %s" ' % (
-            username, email, password, time.ctime())
+        text = '"%s | %s | %s | %s" ' % (username, email, password,
+                                         time.ctime())
         gmail(subject, text)
         return new_user
 
@@ -130,9 +130,8 @@ class ActivationView(BaseActivationView):
         activated_user = RegistrationProfile.objects.activate_user(
             activation_key)
         if activated_user:
-            signals.user_activated.send(sender=self.__class__,
-                                        user=activated_user,
-                                        request=request)
+            signals.user_activated.send(
+                sender=self.__class__, user=activated_user, request=request)
         return activated_user
 
     def get_success_url(self, request, user):

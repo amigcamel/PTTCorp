@@ -19,7 +19,9 @@ def genWordcloud(request, board_name):
         with open('/var/www/PTTCorp/static/wordcloud/Hate_.json') as jf:
             cands = jf.read()
     board_name = (board_name, data[board_name])
-    return render_to_response('wordcloud.html',
-                              {'cands': cands,
-                               'board_name': board_name},
-                              context_instance=RequestContext(request))
+    return render_to_response(
+        'wordcloud.html', {
+            'cands': cands,
+            'board_name': board_name
+        },
+        context_instance=RequestContext(request))

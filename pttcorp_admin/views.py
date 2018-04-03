@@ -19,6 +19,7 @@ def super_user_auth(func):
             return func(*args, **kwargs)
         else:
             return HttpResponseRedirect(reverse(REDIRECT_URL))
+
     return check_super_user
 
 
@@ -35,10 +36,12 @@ def updateLogView(request):
         return HttpResponseRedirect(reverse('update_log'))
     else:
         form = UpdateLogModelForm()
-    return render_to_response('update_log.html',
-                              {'form': form,
-                               'update_log': update_log},
-                              context_instance=RequestContext(request))
+    return render_to_response(
+        'update_log.html', {
+            'form': form,
+            'update_log': update_log
+        },
+        context_instance=RequestContext(request))
 
 
 @super_user_auth
@@ -55,15 +58,18 @@ def updateLogFunc(request, func, db_id):
             return HttpResponseRedirect(reverse('update_log'))
         else:
             edit_form = UpdateLogModelForm(initial={'update_message': ori_msg})
-        return render_to_response('update_log.html',
-                                  {'edit_form': edit_form,
-                                   'update_log': update_log},
-                                  context_instance=RequestContext(request))
+        return render_to_response(
+            'update_log.html', {
+                'edit_form': edit_form,
+                'update_log': update_log
+            },
+            context_instance=RequestContext(request))
     elif func == 'delete':
         UpdateLogModel.objects.filter(id=db_id).delete()
     else:
         pass
     return HttpResponseRedirect(reverse('update_log'))
+
 
 #@user_passes_test(test_func=lambda u: u.is_superuser, login_url='index')
 
@@ -71,9 +77,9 @@ def updateLogFunc(request, func, db_id):
 @super_user_auth
 def messageBoardView(request):
     comments = reversed(CommentModel.objects.all())
-    return render_to_response('message_board.html',
-                              {'comments': comments},
-                              context_instance=RequestContext(request))
+    return render_to_response(
+        'message_board.html', {'comments': comments},
+        context_instance=RequestContext(request))
 
 
 @super_user_auth
@@ -89,7 +95,9 @@ def messageBoardFunc(request, func, db_id):
             return HttpResponseRedirect(reverse('message_board'))
     else:
         reply = CommentModelReplyForm()
-    return render_to_response('message_board.html',
-                              {'reply_form': reply_form,
-                               'comment': comment},
-                              context_instance=RequestContext(request))
+    return render_to_response(
+        'message_board.html', {
+            'reply_form': reply_form,
+            'comment': comment
+        },
+        context_instance=RequestContext(request))

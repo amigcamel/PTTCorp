@@ -12,6 +12,8 @@ register = template.Library()
 def keyword_sub(string):
     res = re.sub('\s\[(.*?)\]\s', '<font color="red">\\1</font>', string)
     return mark_safe(res)
+
+
 # def keyword_sub(string, keyword):
 #     if keyword in string:
 #         res = string.replace(keyword, '<font color="red">%s</font>' % keyword)
@@ -39,6 +41,7 @@ def seg_patch(txt):
 def conv_to_date(num):
     year, month, day = num[:4], num[4:6], num[6:]
     return '%s/%s/%s' % (year, month, day)
+
 
 #@register.filter(name='emo_patch')
 # def emo_patch(emolst):

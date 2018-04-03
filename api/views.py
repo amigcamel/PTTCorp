@@ -24,10 +24,7 @@ class DateTimeEncoder(json.JSONEncoder):
 def test(request):
     res = {'status': 'ok'}
     return HttpResponse(
-        json.dumps(
-            res,
-            indent=4),
-        content_type="application/json")
+        json.dumps(res, indent=4), content_type="application/json")
     return Response({'status': 'ok'})
 
 
@@ -49,15 +46,20 @@ def article(request, board, start_date, end_date):
         return HttpResponseBadRequest(
             'Error: time range should not be greater than %s days' %
             duration_limit)
-    res = mongoDB('PTT', board).find({'post_time': {'$gte': start_date, '$lt': end_date}}, {
-        '_id': 0, 'title': 1, 'content': 1, 'post_time': 1})
+    res = mongoDB('PTT', board).find({
+        'post_time': {
+            '$gte': start_date,
+            '$lt': end_date
+        }
+    }, {
+        '_id': 0,
+        'title': 1,
+        'content': 1,
+        'post_time': 1
+    })
     res = list(res)
     return HttpResponse(
-        json.dumps(
-            res,
-            ensure_ascii=False,
-            indent=4,
-            cls=DateTimeEncoder),
+        json.dumps(res, ensure_ascii=False, indent=4, cls=DateTimeEncoder),
         content_type="application/json; charset=utf-8")
 
 

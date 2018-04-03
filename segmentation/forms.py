@@ -6,15 +6,12 @@ FILE_SIZE_LIMIT = 400  # KB
 
 class segForm(forms.Form):
     box = forms.CharField(
-        widget=forms.Textarea(
-            attrs={
-                'style': 'width:500px'}),
+        widget=forms.Textarea(attrs={'style': 'width:500px'}),
         label=("Input any sentence or text"))
     upload_file = forms.FileField(
         required=False,
         label=("Or upload a text file (optional)"),
-        help_text="File size limit: %d KB" %
-        FILE_SIZE_LIMIT)
+        help_text="File size limit: %d KB" % FILE_SIZE_LIMIT)
 
     def clean_upload_file(self):
         file_size_limit = FILE_SIZE_LIMIT * 1024
@@ -26,8 +23,8 @@ class segForm(forms.Form):
 
         if upload_file.size > file_size_limit:
             raise forms.ValidationError(
-                'Please keep the file size under %d KB. Current size is %.1f KB.' %
-                (FILE_SIZE_LIMIT, upload_file.size / 1000.0))
+                'Please keep the file size under %d KB. Current size is %.1f KB.'
+                % (FILE_SIZE_LIMIT, upload_file.size / 1000.0))
         box = ''
         for chunk in upload_file.chunks():
             box += chunk

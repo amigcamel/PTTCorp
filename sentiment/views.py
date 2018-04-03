@@ -9,9 +9,7 @@ from spcf import sentipol_wrapper
 
 def main(request):
     return render_to_response(
-        'sentiment.html',
-        {},
-        context_instance=RequestContext(request))
+        'sentiment.html', {}, context_instance=RequestContext(request))
 
 
 def sentipol(request):
@@ -26,14 +24,16 @@ def sentipol(request):
             diff = res[1]['diff']
             pos = res[1]['pos']
             neg = res[1]['neg']
-            return render_to_response('sentipol.html',
-                                      {'content': content,
-                                       'pol': pol,
-                                       'pos': pos,
-                                       'neg': neg},
-                                      context_instance=RequestContext(request))
+            return render_to_response(
+                'sentipol.html', {
+                    'content': content,
+                    'pol': pol,
+                    'pos': pos,
+                    'neg': neg
+                },
+                context_instance=RequestContext(request))
     else:
         form = SentipolForm()
     return render_to_response(
-        'sentipol.html', {
-            'form': form}, context_instance=RequestContext(request))
+        'sentipol.html', {'form': form},
+        context_instance=RequestContext(request))

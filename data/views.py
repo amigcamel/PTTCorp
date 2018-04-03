@@ -6,6 +6,4 @@ from django.template import Context, RequestContext
 
 def main(request):
     return render_to_response(
-        'data.html',
-        {},
-        context_instance=RequestContext(request))
+        'data.html', {}, context_instance=RequestContext(request))

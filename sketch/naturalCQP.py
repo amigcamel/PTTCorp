@@ -39,7 +39,6 @@ def ncqp(s):
 #    res = '|'.join([''.join(['[word="%s"]' % i for i in j]) for j in res])
 #    return res
 
-
 # def ncqp(string):
 #     x = '...'
 #     X = '[]'
