@@ -16,10 +16,11 @@ class RegistrationAdmin(admin.ModelAdmin):
         """
         Activates the selected users, if they are not alrady
         activated.
-        
+
         """
         for profile in queryset:
             RegistrationProfile.objects.activate_user(profile.activation_key)
+
     activate_users.short_description = _("Activate users")
 
     def resend_activation_email(self, request, queryset):
@@ -30,7 +31,7 @@ class RegistrationAdmin(admin.ModelAdmin):
         who are eligible to activate; emails will not be sent to users
         whose activation keys have expired or who have already
         activated.
-        
+
         """
         if Site._meta.installed:
             site = Site.objects.get_current()
@@ -40,6 +41,7 @@ class RegistrationAdmin(admin.ModelAdmin):
         for profile in queryset:
             if not profile.activation_key_expired():
                 profile.send_activation_email(site)
+
     resend_activation_email.short_description = _("Re-send activation emails")
 
 

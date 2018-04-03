@@ -7,14 +7,20 @@ from intro.forms import ContactForm
 from misc.mongo import connect
 from misc.sendmail import gmail
 
+
 def main(request):
-    return render_to_response('intro.html', {}, context_instance=RequestContext(request))
+    return render_to_response(
+        'intro.html', {}, context_instance=RequestContext(request))
+
 
 def data(request):
     pttmeta = connect('PTTmeta', 'info')
-    pttmeta = pttmeta.find({}, {'_id':0})
+    pttmeta = pttmeta.find({}, {'_id': 0})
     pttmeta = list(pttmeta)
-    return render_to_response('data.html', {'metainfo':pttmeta},context_instance=RequestContext(request))
+    return render_to_response(
+        'data.html', {'metainfo': pttmeta},
+        context_instance=RequestContext(request))
+
 
 def contact(request):
     if request.method == 'POST':
@@ -26,13 +32,15 @@ def contact(request):
             subject += '(sent from %s by %s)' % (email, name)
             message = form.cleaned_data['message']
             gmail(subject, message)
-            request.flash['notice'] = 'Congrats! Your message has been sent successfully!'
+            request.flash[
+                'notice'] = 'Congrats! Your message has been sent successfully!'
             return HttpResponseRedirect(reverse('intro_contact'))
     else:
-    	if request.user.is_anonymous():
-    		email = None
-    	else:
-    		email = request.user.email
-        form = ContactForm(initial={'email':email})
-    return render_to_response('contact.html', {'form':form}, context_instance=RequestContext(request))
-
+        if request.user.is_anonymous():
+            email = None
+        else:
+            email = request.user.email
+        form = ContactForm(initial={'email': email})
+    return render_to_response(
+        'contact.html', {'form': form},
+        context_instance=RequestContext(request))

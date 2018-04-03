@@ -5,6 +5,8 @@ register = template.Library()
 import json
 
 # settings value
+
+
 @register.simple_tag
 def settings_value(name, *args):
     res = getattr(settings, name, "")
@@ -16,6 +18,5 @@ def settings_value(name, *args):
             res = res[k]
         except StopIteration:
             return res
-        except:
+        except BaseException:
             raise
-    
